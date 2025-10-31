@@ -88,12 +88,12 @@ str(treeItems, max.level = 3)
 #> List of 2
 #>  $ :List of 3
 #>   ..$ label   : chr "SimpleTreeView"
-#>   ..$ id      : chr "SimpleTreeView-4185118"
+#>   ..$ id      : chr "SimpleTreeView-8560913"
 #>   ..$ children:List of 1
 #>   .. ..$ :List of 2
 #>  $ :List of 3
 #>   ..$ label   : chr "RichTreeView"
-#>   ..$ id      : chr "RichTreeView-7923291"
+#>   ..$ id      : chr "RichTreeView-5995978"
 #>   ..$ children:List of 1
 #>   .. ..$ :List of 2
 ```
@@ -139,9 +139,12 @@ As `createTree()` is adapted from
 [`shinyWidgets::create_tree()`](https://dreamrs.github.io/shinyWidgets/reference/create_tree.html),
 I want to thank the authors of shinyWidgets for their amazing work!
 
-### Rich Tree View node expanded
+### Rich Tree View default selection and expand
 
-You can expand by default one or multiple nodes with the
+Select by default one or multiple items with the `defaultSelectedItems`
+argument by providing its related IDs.
+
+You can also expand by default one or multiple nodes with the
 `defaultExpandedItems` argument by providing its related IDs.
 
 ``` r
@@ -153,9 +156,13 @@ df <- data.frame(
 
 treeItems <- createTree(df)
 
+defaultSelectedId <- treeItems[[1]]$children[[1]]$id
+defaultExpandedId <- treeItems[[1]]$id
+
 RichTreeView(
   items = treeItems,
-  defaultExpandedItems = list(treeItems[[1]]$id) # always in list()
+  defaultSelectedItems = list(defaultSelectedId), # always in list()
+  defaultExpandedItems = list(defaultExpandedId) # always in list()
 )
 ```
 
@@ -182,6 +189,8 @@ df <- data.frame(
 )
 
 treeItems <- createTree(df)
+defaultExpanded <- treeItems[[1]]$id
+defaultSelectedId <- treeItems[[1]]$children[[1]]$id
 
 ui <- tagList(
   reactOutput("tree"),
@@ -193,16 +202,37 @@ server <- function(input, output, session) {
     RichTreeView(
       items = treeItems,
       # expand by default a node with its id
-      defaultExpandedItems = list(treeItems[[1]]$id), # always in list()
+      defaultSelectedItems = list(defaultSelectedId), # always in list()
+      defaultExpandedItems = list(defaultExpanded), # always in list()
       onItemSelectionToggle = setInput(
         inputId = "itemSelection", 
         jsAccessor = "[1]"
       )
     )
   })
+  
+  # Reproduce logic from official MUI's documentation
+  selectedItems <- reactiveValues(
+    selected = defaultSelectedId
+  )
+  
+  observeEvent(input$itemSelection, {
+    current_selection <- input$itemSelection
+    
+    if(current_selection %in% selectedItems$selected) {
+      # Remove if already selected
+      new_selection <- setdiff(selectedItems$selected, current_selection)
+    } else {
+      # Add if not selected
+      new_selection <- c(selectedItems$selected, current_selection)
+    }
+    
+    selectedItems$selected <- new_selection
+  })
+  
   output$info <- shiny::renderPrint(
     # remove random ID to return only item label name
-    gsub(pattern = "\\-.*$", replacement = "", x = input$itemSelection)
+    gsub(pattern = "\\-.*$", replacement = "", x = selectedItems$selected)
   )
 }
 
@@ -228,6 +258,9 @@ df <- data.frame(
 
 treeItems <- createTree(df)
 
+defaultExpandedId <- treeItems[[1]]$id
+defaultSelectedId <- treeItems[[1]]$children[[1]]$children[[1]]$id
+
 ui <- tagList(
   reactOutput("tree"),
   verbatimTextOutput("info")
@@ -240,10 +273,10 @@ server <- function(input, output, session) {
       multiSelect = TRUE,
       items = treeItems,
       # expand by default a node with its id
-      defaultExpandedItems = list(treeItems[[1]]$id), # always in list()
-      # By default, selecting a parent item does not select its children.
+      defaultExpandedItems = list(defaultExpandedId), # always in list()
+      defaultSelectedItems = list(defaultSelectedId), # always in list()
+      # By default, selecting a item does not select its children.
       selectionPropagation = list(
-        parents = TRUE, 
         descendants = TRUE
       ),
       onItemSelectionToggle = shiny.react::setInput(
@@ -254,8 +287,9 @@ server <- function(input, output, session) {
   })
   
   # Reproduce logic from official MUI's documentation
-  selectedItems <- reactiveValues()
-  selectedItems$selected <- NULL
+  selectedItems <- reactiveValues(
+    selected = defaultSelectedId
+  )
   
   observeEvent(input$itemSelection, {
     current_selection <- input$itemSelection
