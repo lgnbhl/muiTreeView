@@ -88,12 +88,12 @@ str(treeItems, max.level = 3)
 #> List of 2
 #>  $ :List of 3
 #>   ..$ label   : chr "SimpleTreeView"
-#>   ..$ id      : chr "SimpleTreeView-8560913"
+#>   ..$ id      : chr "SimpleTreeView-3435518"
 #>   ..$ children:List of 1
 #>   .. ..$ :List of 2
 #>  $ :List of 3
 #>   ..$ label   : chr "RichTreeView"
-#>   ..$ id      : chr "RichTreeView-5995978"
+#>   ..$ id      : chr "RichTreeView-7881784"
 #>   ..$ children:List of 1
 #>   .. ..$ :List of 2
 ```
@@ -165,6 +165,44 @@ RichTreeView(
   defaultExpandedItems = list(defaultExpandedId) # always in list()
 )
 ```
+
+### Simple Tree View
+
+Using `SimpleTreeView()` with `TreeItem()`, you can easily customize
+items with icons for example:
+
+``` r
+SimpleTreeView(
+  defaultExpandedItems = list("documents"), # always in list()
+  defaultSelectedItems = list("notes"), # always in list()
+  TreeItem(
+    itemId = "documents", 
+    label = div(shiny::icon("folder"), " Documents"),
+    TreeItem(
+      itemId = "notes", 
+      label = div(shiny::icon("file"), " Notes")
+    ),
+    TreeItem(
+      itemId = "images", 
+      label = div(shiny::icon("image"), " Images")
+    ),
+    TreeItem(
+      itemId = "videos", 
+      label = div(shiny::icon("video"), " Videos")
+    )
+  ),
+  TreeItem(
+    itemId = "history", 
+    label = div(shiny::icon("history"), " History")
+  ),
+  TreeItem(
+    itemId = "trash", 
+    label = div(shiny::icon("trash"), " Trash")
+  )
+)
+```
+
+<img src="man/figures/simpleTreeView.png" alt="multiple clicked" style="padding:1px;border:thin solid black;"/>
 
 ## Usage with Shiny
 
@@ -317,32 +355,11 @@ shinyApp(ui, server)
 
 <img src="man/figures/itemMultipleClicked.png" alt="multiple clicked" style="padding:1px;border:thin solid black;"/>
 
-### MUI Simple Tree View
-
-Use `SimpleTreeView()` with `TreeItem()`:
-
-``` r
-SimpleTreeView(
-  TreeItem(
-    itemId = "muiTreeView-1", 
-    label = "muiTreeView",
-    TreeItem(
-      itemId = "SimpleTreeView-2", 
-      label = "SimpleTreeView"
-    ),
-    TreeItem(
-      itemId = "RichTreeView-3", 
-      label = "RichTreeView"
-    )
-  )
-)
-```
-
 ### More features
 
 Explore the [official MUI Tree View
-documentation](https://mui.com/x/react-tree-view/rich-tree-view) to see
-how more features can be added.
+documentation](https://mui.com/x/react-tree-view/) to see how more
+features can be added.
 
 ### Use other MUI products
 
