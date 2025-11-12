@@ -88,12 +88,12 @@ str(treeItems, max.level = 3)
 #> List of 2
 #>  $ :List of 3
 #>   ..$ label   : chr "SimpleTreeView"
-#>   ..$ id      : chr "SimpleTreeView-3435518"
+#>   ..$ id      : chr "SimpleTreeView-3700051"
 #>   ..$ children:List of 1
 #>   .. ..$ :List of 2
 #>  $ :List of 3
 #>   ..$ label   : chr "RichTreeView"
-#>   ..$ id      : chr "RichTreeView-7881784"
+#>   ..$ id      : chr "RichTreeView-1247819"
 #>   ..$ children:List of 1
 #>   .. ..$ :List of 2
 ```
@@ -165,6 +165,34 @@ RichTreeView(
   defaultExpandedItems = list(defaultExpandedId) # always in list()
 )
 ```
+
+### Custom styling
+
+As **muiTreeView** is using the Material UI library under the hood, you
+can customize component styles using CSS classes with the “sx” argument:
+
+``` r
+RichTreeView(
+  items = treeItems,
+  sx = list(
+    ".MuiTreeItem-root" = list(
+      ".Mui-selected, .Mui-selected:hover, .Mui-focused.Mui-selected" = list(
+        background = "red"
+      )
+    )
+  )
+)
+```
+
+<img src="man/figures/richTreeView-custom.png" alt="customized clicked" style="padding:1px;border:thin solid black;"/>
+
+Note that even if the [CSS
+classes](https://mui.com/x/api/tree-view/tree-item/#classes) are
+deprecated they are still working.
+
+You can access all Material UI components using the
+[shinyMaterialUI](https://felixluginbuhl.com/shinyMaterialUI/) R
+package.
 
 ### Simple Tree View
 

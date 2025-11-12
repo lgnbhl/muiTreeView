@@ -161,6 +161,29 @@ RichTreeView(
 )
 ```
 
+### Custom styling
+
+As **muiTreeView** is using the Material UI library under the hood, you can customize component styles using CSS classes with the "sx" argument:
+
+```r
+RichTreeView(
+  items = treeItems,
+  sx = list(
+    ".MuiTreeItem-root" = list(
+      ".Mui-selected, .Mui-selected:hover, .Mui-focused.Mui-selected" = list(
+        background = "red"
+      )
+    )
+  )
+)
+```
+
+<img src="man/figures/richTreeView-custom.png" alt="customized clicked" style="padding:1px;border:thin solid black;"/>
+
+Note that even if the [CSS classes](https://mui.com/x/api/tree-view/tree-item/#classes) are deprecated they are still working.
+
+You can access all Material UI components using the [shinyMaterialUI](https://felixluginbuhl.com/shinyMaterialUI/) R package.
+
 ### Simple Tree View
 
 Using `SimpleTreeView()` with `TreeItem()`, you can easily customize items with icons for example:
