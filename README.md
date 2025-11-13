@@ -88,12 +88,12 @@ str(treeItems, max.level = 3)
 #> List of 2
 #>  $ :List of 3
 #>   ..$ label   : chr "SimpleTreeView"
-#>   ..$ id      : chr "SimpleTreeView-3700051"
+#>   ..$ id      : chr "SimpleTreeView-7284628"
 #>   ..$ children:List of 1
 #>   .. ..$ :List of 2
 #>  $ :List of 3
 #>   ..$ label   : chr "RichTreeView"
-#>   ..$ id      : chr "RichTreeView-1247819"
+#>   ..$ id      : chr "RichTreeView-9144882"
 #>   ..$ children:List of 1
 #>   .. ..$ :List of 2
 ```
@@ -177,7 +177,8 @@ RichTreeView(
   sx = list(
     ".MuiTreeItem-root" = list(
       ".Mui-selected, .Mui-selected:hover, .Mui-focused.Mui-selected" = list(
-        background = "red"
+        background = "red",
+        color = "white"
       )
     )
   )
@@ -212,11 +213,23 @@ SimpleTreeView(
     ),
     TreeItem(
       itemId = "images", 
-      label = div(shiny::icon("image"), " Images")
+      label = div(shiny::icon("image"), " Images"),
+      sx = list(
+        ".Mui-selected, .Mui-selected:hover, .Mui-focused.Mui-selected" = list(
+          background = "lightgreen",
+          color = "white"
+        )
+      )
     ),
     TreeItem(
       itemId = "videos", 
-      label = div(shiny::icon("video"), " Videos")
+      label = div(shiny::icon("video"), " Videos"),
+      sx = list(
+        ".Mui-selected, .Mui-selected:hover, .Mui-focused.Mui-selected" = list(
+          background = "lightblue",
+          color = "white"
+        )
+      )
     )
   ),
   TreeItem(
