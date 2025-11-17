@@ -12,7 +12,7 @@
 #' @return a `list` that can be used in [RichTreeView()].
 #' @seealso `shinyWidgets::create_tree()`
 #' @export
-createTree <- function (data, levels = names(data), levels_id = NULL, ...) {
+asMuiTree <- function (data, levels = names(data), levels_id = NULL, ...) {
 
   dropNullsOrEmpty <- function (x) {
     x[!vapply(x, null_or_empty, FUN.VALUE = logical(1))]
@@ -48,7 +48,7 @@ createTree <- function (data, levels = names(data), levels_id = NULL, ...) {
                  list(
                    label = var,
                    id = paste0(var, "-", sample.int(1e+07, 1)),
-                   children = createTree(
+                   children = asMuiTree(
                      data = dat,
                      levels = levels[-1], ...)
                    )
@@ -72,7 +72,7 @@ createTree <- function (data, levels = names(data), levels_id = NULL, ...) {
              }
              else {
                c(dropNullsOrEmpty(list(label = label, id = as.character(id),
-                                       children = createTree(data = dat, levels = levels[-1],
+                                       children = asMuiTree(data = dat, levels = levels[-1],
                                                                levels_id = levels_id[-1], ...))), args_level)
              }
            })

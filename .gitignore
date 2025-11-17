@@ -2,3 +2,4 @@ docs
 js/node_modules
 js/README.MD
 .Rproj.user
+inst/doc
