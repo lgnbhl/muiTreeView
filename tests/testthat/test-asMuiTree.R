@@ -4,7 +4,7 @@ test_that("createTree creates a list", {
     functions = c("SimpleTreeView", "RichTreeView")
   )
 
-  treeItems <- muiTreeView::createTree(df)
+  treeItems <- muiTreeView::asMuiTree(df)
   
   # https://stackoverflow.com/a/13433689
   depth <- function(this,thisdepth=0){
