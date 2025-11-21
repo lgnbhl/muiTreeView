@@ -133,13 +133,14 @@ df <- data.frame(
 
 treeItems <- asMuiTree(df)
 
-defaultSelectedId <- treeItems[[1]]$children[[1]]$id
-defaultExpandedId <- treeItems[[1]]$id
+defaultSelectedId <- treeItems[[1]]$children[[1]]$children[[1]]$id
+defaultExpandedId_1 <- treeItems[[1]]$children[[1]]$id
+defaultExpandedId_2 <- treeItems[[1]]$id
 
 RichTreeView(
   items = treeItems,
   defaultSelectedItems = list(defaultSelectedId), # always in list()
-  defaultExpandedItems = list(defaultExpandedId) # always in list()
+  defaultExpandedItems = list(defaultExpandedId_1, defaultExpandedId_2) # always in list()
 )
 ```
 
@@ -237,7 +238,8 @@ defaultSelectedId <- treeItems[[1]]$children[[1]]$id
 
 ui <- tagList(
   reactOutput("tree"),
-  verbatimTextOutput("info")
+  #verbatimTextOutput("treeId"),
+  verbatimTextOutput("treeLabel")
 )
 
 server <- function(input, output, session) {
@@ -272,10 +274,13 @@ server <- function(input, output, session) {
     
     selectedItems$selected <- new_selection
   })
-  
-  output$info <- shiny::renderPrint(
-    # remove random ID to return only item label name
-    gsub(pattern = "\\-.*$", replacement = "", x = selectedItems$selected)
+  # output$treeId <- shiny::renderPrint(
+  #   # return item label with tree ID (not cleaning with gsub())
+  #   selectedItems$selected
+  # )
+  output$treeLabel <- shiny::renderPrint(
+    # remove dash "-" followed by a random digit (i.e. MUI tree ID) to return only item label
+    gsub(pattern = "\\-[[:digit:]]*$", replacement = "", x = selectedItems$selected)
   )
 }
 
@@ -304,7 +309,8 @@ defaultSelectedId <- treeItems[[1]]$children[[1]]$children[[1]]$id
 
 ui <- tagList(
   reactOutput("tree"),
-  verbatimTextOutput("info")
+  #verbatimTextOutput("treeId"),
+  verbatimTextOutput("treeLabel")
 )
 
 server <- function(input, output, session) {
@@ -345,10 +351,13 @@ server <- function(input, output, session) {
     
     selectedItems$selected <- new_selection
   })
-  
-  output$info <- shiny::renderPrint(
-    # remove random ID to return only item label name
-    gsub(pattern = "\\-.*$", replacement = "", x = selectedItems$selected)
+  # output$treeId <- shiny::renderPrint(
+  #   # return item label with tree ID (not cleaning with gsub())
+  #   selectedItems$selected
+  # )
+  output$treeLabel <- shiny::renderPrint(
+    # remove dash "-" followed by a random digit (i.e. MUI tree ID) to return only item label
+    gsub(pattern = "\\-[[:digit:]]*$", replacement = "", x = selectedItems$selected)
   )
 
 }
