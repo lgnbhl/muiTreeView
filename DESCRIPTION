@@ -2,10 +2,12 @@ Package: muiTreeView
 Type: Package
 Title: 'MUI X Tree View' for 'shiny' Apps and 'Quarto'
 Version: 0.1.1
-Authors@R: 
-    c(
-      person(given = "Felix", family = "Luginbuhl", role = c("aut", "cre"), email = "felix.luginbuhl@protonmail.ch")
-    )
+Authors@R: c(
+  person(
+    given = "Felix", 
+    family = "Luginbuhl", 
+    role = c("aut", "cre"), 
+    email = "felix.luginbuhl@protonmail.ch"))
 Maintainer: Felix Luginbuhl <felix.luginbuhl@protonmail.ch>
 Description:
   Give access to 'MUI X Tree View' components, which lets users navigate hierarchical 
