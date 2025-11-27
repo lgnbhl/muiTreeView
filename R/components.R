@@ -5,7 +5,7 @@ component <- function(name, module = '@mui/x-tree-view') {
     module = module,
     name = name,
     props = shiny.react::asProps(...),
-    deps = muiTreeDependency()
+    deps = muiTreeViewDependency()
   )
 }
 

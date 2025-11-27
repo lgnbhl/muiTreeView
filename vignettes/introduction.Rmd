@@ -22,10 +22,6 @@ knitr::opts_chunk$set(
 install.packages("muiTreeView")
 ```
 
-```{r setup}
-library(muiTreeView)
-```
-
 ## Basic examples
 
 ```{r}

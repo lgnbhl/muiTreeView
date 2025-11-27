@@ -4,8 +4,7 @@ Title: 'MUI X Tree View' for 'shiny' Apps and 'Quarto'
 Version: 0.1.1
 Authors@R: 
     c(
-      person(given = "Felix", family = "Luginbuhl", role = c("aut", "cre"), email = "felix.luginbuhl@protonmail.ch"),
-      person(family = "MUI", role = c("ctb", "cph"), comment = "MUI template <https://mui.com/>")
+      person(given = "Felix", family = "Luginbuhl", role = c("aut", "cre"), email = "felix.luginbuhl@protonmail.ch")
     )
 Maintainer: Felix Luginbuhl <felix.luginbuhl@protonmail.ch>
 Description:

@@ -1,9 +1,9 @@
-#' Mui Tree UI JS dependency
+#' Mui X Tree View JS dependency
 #'
 #' @return HTML dependency object.
 #'
 #' @export
-muiTreeDependency <- function() {
+muiTreeViewDependency <- function() {
   htmltools::htmlDependency(
     name = "muiTreeView",
     version = "0.1.0",
