@@ -8,7 +8,7 @@
 [![CRAN
 status](https://www.r-pkg.org/badges/version/muiTreeView)](https://CRAN.R-project.org/package=muiTreeView)
 [![R-CMD-check](https://github.com/lgnbhl/muiTreeView/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/lgnbhl/muiTreeView/actions/workflows/R-CMD-check.yaml)
-[![](https://img.shields.io/badge/@mui/x--tree--view-%5E8.16.0-blue.svg)](https://mui.com/x/react-tree-view/)
+[![](https://img.shields.io/badge/@mui/x--tree--view-8.19.0-blue.svg)](https://mui.com/x/react-tree-view/)
 [![](https://img.shields.io/badge/react-18.3.1-blue.svg)](https://mui.com/x/react-tree-view/)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Follow-E4405F?style=social&logo=linkedin)](https://www.linkedin.com/in/FelixLuginbuhl)
 <!-- badges: end -->
@@ -29,7 +29,7 @@ remotes::install_github("lgnbhl/muiTreeView")
 **Read the full documentation with examples
 [here](https://lgnbhl.github.io/muiTreeView/articles/introduction.html).**
 
-## Basic examples
+## Basic example
 
 ``` r
 library(muiTreeView)
@@ -51,7 +51,12 @@ RichTreeView(
 
 <img src="https://raw.githubusercontent.com/lgnbhl/muiTreeView/refs/heads/main/man/figures/checkboxMultiSelect.png" alt="RichTreeView" style="padding:1px;border:thin solid black;"/>
 
-### Contribute
+## Full documentation
+
+**All the docs with examples are
+[here](https://felixluginbuhl.com/muiTreeView/).**
+
+## Contribute
 
 If you have any issue, question or want to contribute with a pull
 request, don’t hesitate to write me on

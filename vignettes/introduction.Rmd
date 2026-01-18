@@ -17,18 +17,15 @@ knitr::opts_chunk$set(
 ## Install
 
 ``` r
-#remotes::install_github("lgnbhl/muiTreeView") # development version
-
+#remotes::install_github("lgnbhl/muiTreeView") # dev version
 install.packages("muiTreeView")
 ```
-
-## Basic examples
 
 ```{r}
 library(muiTreeView)
 ```
 
-### MUI Rich Tree View
+## MUI Rich Tree View
 
 Use `RichTreeView()` with the `asMuiTree()` helper function:
 
@@ -54,7 +51,7 @@ You can activate checkbox selection with `checkboxSelection = TRUE` and multi se
 RichTreeView(
   items = treeItems,
   checkboxSelection = TRUE,
-  multiSelect = TRUE # FALSE for single select
+  multiSelect = TRUE # FALSE for single select,
 )
 ```
 
@@ -162,7 +159,7 @@ Note that even if the [CSS classes](https://mui.com/x/api/tree-view/tree-item/#c
 
 You can access all Material UI components using the [shinyMaterialUI](https://felixluginbuhl.com/shinyMaterialUI/) R package.
 
-### Simple Tree View
+## Simple Tree View
 
 Using `SimpleTreeView()` with `TreeItem()`, you can easily customize items with icons for example:
 
@@ -215,7 +212,7 @@ SimpleTreeView(
 
 You can get user item clicked in Shiny using the `onItemSelectionToggle` argument (more info [here](https://mui.com/x/react-tree-view/rich-tree-view/selection/#track-item-selection-change)), by creating a "itemSelection" input with `shiny.react::setInput()`.
 
-As the "itemSelection" input returns the label name followed by a dash "-" with a random integer, you can get the cleaned label using `gsub()`, i.e. `gsub(pattern = "\\-.*$", replacement = "", x = input$itemSelection)`
+As the "itemSelection" input returns the label name followed by a dash "-" with a random integer, you can get the cleaned label using `gsub()`, i.e. `gsub(pattern = "\\-[[:digit:]]*$", replacement = "", x = input$itemSelection)`
 
 ### Track latest item clicked
 
@@ -233,25 +230,21 @@ defaultExpanded <- treeItems[[1]]$id
 defaultSelectedId <- treeItems[[1]]$children[[1]]$id
 
 ui <- tagList(
-  reactOutput("tree"),
+  RichTreeView(
+    items = treeItems,
+    # expand by default a node with its id
+    defaultSelectedItems = list(defaultSelectedId), # always in list()
+    defaultExpandedItems = list(defaultExpanded), # always in list()
+    onItemSelectionToggle = setInput(
+      inputId = "itemSelection", 
+      jsAccessor = "[1]"
+    )
+  ),
   #verbatimTextOutput("treeId"),
   verbatimTextOutput("treeLabel")
 )
 
 server <- function(input, output, session) {
-  output$tree <- renderReact({
-    RichTreeView(
-      items = treeItems,
-      # expand by default a node with its id
-      defaultSelectedItems = list(defaultSelectedId), # always in list()
-      defaultExpandedItems = list(defaultExpanded), # always in list()
-      onItemSelectionToggle = setInput(
-        inputId = "itemSelection", 
-        jsAccessor = "[1]"
-      )
-    )
-  })
-  
   # Reproduce logic from official MUI's documentation
   selectedItems <- reactiveValues(
     selected = defaultSelectedId
@@ -304,31 +297,27 @@ defaultExpandedId <- treeItems[[1]]$id
 defaultSelectedId <- treeItems[[1]]$children[[1]]$children[[1]]$id
 
 ui <- tagList(
-  reactOutput("tree"),
+  RichTreeView(
+    checkboxSelection = TRUE,
+    multiSelect = TRUE,
+    items = treeItems,
+    # expand by default a node with its id
+    defaultExpandedItems = list(defaultExpandedId), # always in list()
+    defaultSelectedItems = list(defaultSelectedId), # always in list()
+    # By default, selecting a item does not select its children.
+    selectionPropagation = list(
+      descendants = TRUE
+    ),
+    onItemSelectionToggle = setInput(
+      inputId = "itemSelection", 
+      jsAccessor = "[1]"
+    )
+  ),
   #verbatimTextOutput("treeId"),
   verbatimTextOutput("treeLabel")
 )
 
 server <- function(input, output, session) {
-  output$tree <- renderReact({
-    RichTreeView(
-      checkboxSelection = TRUE,
-      multiSelect = TRUE,
-      items = treeItems,
-      # expand by default a node with its id
-      defaultExpandedItems = list(defaultExpandedId), # always in list()
-      defaultSelectedItems = list(defaultSelectedId), # always in list()
-      # By default, selecting a item does not select its children.
-      selectionPropagation = list(
-        descendants = TRUE
-      ),
-      onItemSelectionToggle = shiny.react::setInput(
-        inputId = "itemSelection", 
-        jsAccessor = "[1]"
-      )
-    )
-  })
-  
   # Reproduce logic from official MUI's documentation
   selectedItems <- reactiveValues(
     selected = defaultSelectedId
@@ -363,19 +352,19 @@ shinyApp(ui, server)
 
 <img src="https://raw.githubusercontent.com/lgnbhl/muiTreeView/refs/heads/main/man/figures/itemMultipleClicked.png" alt="multiple clicked" style="padding:1px;border:thin solid black;"/>
 
-### More features
+## More features
 
 Explore the [official MUI Tree View documentation](https://mui.com/x/react-tree-view/) to see how more features can be added.
 
 ### Use other MUI products
 
-MUI X Tree View is developed MUI, the company behind the popular React framework Material UI. **muiTreeView** is therefore a companion to the R package [**shinyMaterialUI**](https://felixluginbuhl.com/shinyMaterialUI/) , which provides access to all Material UI components from R.
+MUI X Tree View is developed MUI, the company behind the popular React framework Material UI. **muiTreeView** is therefore a companion to the R package [**muiMaterial**](https://felixluginbuhl.com/muiMaterial/) , which provides access to all Material UI components from R.
 
 ### Bootstrap conflict
 
 **muiTreeView** can enter in conflict with the Bootstrap CSS framework, used by default in Shiny functions such as `shiny::fluidPage()` and friends. 
 
-The Bootstrap conflict could potentially be solved using [Shadow DOM](https://mui.com/material-ui/customization/shadow-dom/).
+You can use `muiMaterial::muiMaterialPage()` and `muiMaterial::CssBaseline()` to avoid using Bootstrap and normalized CSS. See [**muiMaterial**](https://felixluginbuhl.com/muiMaterial/) docs for more information.
 
 ### Contribute
 

@@ -42,7 +42,7 @@ remotes::install_github("lgnbhl/muiTreeView")
 
 **Read the full documentation with examples [here](https://lgnbhl.github.io/muiTreeView/articles/introduction.html).**
 
-## Basic examples
+## Basic example
 
 ```r
 library(muiTreeView)
@@ -64,7 +64,11 @@ RichTreeView(
 
 <img src="https://raw.githubusercontent.com/lgnbhl/muiTreeView/refs/heads/main/man/figures/checkboxMultiSelect.png" alt="RichTreeView" style="padding:1px;border:thin solid black;"/>
 
-### Contribute
+## Full documentation
+
+**All the docs with examples are [here](https://felixluginbuhl.com/muiTreeView/).**
+
+## Contribute
 
 If you have any issue, question or want to contribute with a pull request, don't hesitate to write me on https://github.com/lgnbhl/muiTreeView
 
