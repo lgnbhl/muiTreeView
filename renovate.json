@@ -4,5 +4,12 @@
     "config:recommended",
     "group:allNonMajor",
     "schedule:monthly"
+  ],
+  "packageRules": [
+    {
+      "matchPackagePrefixes": ["react"],
+      "matchCurrentVersion": ^18.3.1
+      "enabled": false
+    }
   ]
 }
