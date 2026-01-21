@@ -7,5 +7,7 @@
 ^docs$
 ^pkgdown$
 ^\.github$
+^vignettes$
+^inst/helpers$
 ^renovate.json
 ^reinstall.sh$

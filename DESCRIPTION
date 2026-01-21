@@ -19,12 +19,9 @@ Imports:
     htmltools,
     shiny.react (>= 0.4.0)
 Suggests: 
-    knitr,
-    rmarkdown,
     shiny,
     testthat (>= 3.0.0)
 RoxygenNote: 7.3.3
-URL: https://felixluginbuhl.com/muiTreeView
+URL: https://felixluginbuhl.com/muiTreeView/
 BugReports: https://github.com/lgnbhl/muiTreeView/issues
 Config/testthat/edition: 3
-VignetteBuilder: knitr

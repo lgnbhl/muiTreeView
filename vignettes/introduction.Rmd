@@ -229,6 +229,12 @@ treeItems <- asMuiTree(df)
 defaultExpanded <- treeItems[[1]]$id
 defaultSelectedId <- treeItems[[1]]$children[[1]]$id
 
+# remove dash "-" followed by a random digit (i.e. MUI tree ID) 
+# to return only item label
+cleanTreeId <- function(treeId) {
+  gsub("\\-[[:digit:]]*$", "", treeId)
+}
+
 ui <- tagList(
   RichTreeView(
     items = treeItems,
@@ -236,40 +242,20 @@ ui <- tagList(
     defaultSelectedItems = list(defaultSelectedId), # always in list()
     defaultExpandedItems = list(defaultExpanded), # always in list()
     onItemSelectionToggle = setInput(
-      inputId = "itemSelection", 
+      inputId = "itemSelection",
       jsAccessor = "[1]"
     )
   ),
-  #verbatimTextOutput("treeId"),
   verbatimTextOutput("treeLabel")
 )
 
 server <- function(input, output, session) {
-  # Reproduce logic from official MUI's documentation
-  selectedItems <- reactiveValues(
-    selected = defaultSelectedId
-  )
-  
-  observeEvent(input$itemSelection, {
-    current_selection <- input$itemSelection
-    
-    if(current_selection %in% selectedItems$selected) {
-      # Remove if already selected
-      new_selection <- setdiff(selectedItems$selected, current_selection)
-    } else {
-      # Add if not selected
-      new_selection <- c(selectedItems$selected, current_selection)
-    }
-    
-    selectedItems$selected <- new_selection
-  })
-  # output$treeId <- shiny::renderPrint(
-  #   # return item label with tree ID (not cleaning with gsub())
-  #   selectedItems$selected
-  # )
   output$treeLabel <- shiny::renderPrint(
-    # remove dash "-" followed by a random digit (i.e. MUI tree ID) to return only item label
-    gsub(pattern = "\\-[[:digit:]]*$", replacement = "", x = selectedItems$selected)
+    if(is.null(input$itemSelection)) {
+      cleanTreeId(defaultSelectedId)
+    } else { 
+      cleanTreeId(input$itemSelection)
+    }
   )
 }
 
@@ -280,7 +266,9 @@ shinyApp(ui, server)
 
 ### Track multiple items with checkbox selection 
 
-You can use reactive values to get multiple items selection by implementing the logic as showed in the [official MUI documentation](https://mui.com/x/react-tree-view/rich-tree-view/selection/#track-item-selection-change).
+You can use the same Shiny logic with multiple selection.
+
+Use the `selectionPropagation` argument to choose if selecting a parent item does select its children (it doesn't by default).
 
 ```r
 library(shiny)
@@ -295,6 +283,12 @@ treeItems <- asMuiTree(df)
 
 defaultExpandedId <- treeItems[[1]]$id
 defaultSelectedId <- treeItems[[1]]$children[[1]]$children[[1]]$id
+
+# remove dash "-" followed by a random digit (i.e. MUI tree ID) 
+# to return only item label
+cleanTreeId <- function(treeId) {
+  gsub("\\-[[:digit:]]*$", "", treeId)
+}
 
 ui <- tagList(
   RichTreeView(
@@ -341,8 +335,7 @@ server <- function(input, output, session) {
   #   selectedItems$selected
   # )
   output$treeLabel <- shiny::renderPrint(
-    # remove dash "-" followed by a random digit (i.e. MUI tree ID) to return only item label
-    gsub(pattern = "\\-[[:digit:]]*$", replacement = "", x = selectedItems$selected)
+    cleanTreeId(selectedItems$selected)
   )
 
 }
