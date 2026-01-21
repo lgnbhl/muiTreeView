@@ -28,6 +28,6 @@ Object with \code{shiny.tag} class suitable for use in the UI of a Shiny app.
 \item onKeyDown \code{func} \cr Default is - Callback fired when a key is pressed on the keyboard and the tree is in focus.
 \item slotProps \code{object} \cr Default is  The props used for each component slot.
 \item slots \code{object} \cr Default is  Overridable component slots.See Slots API below for more details.
-\item sx \verb{Array<func| object| bool>| func| object} \cr Default is - The system prop that allows defining system overrides as well as additional CSS styles.See the \code{sx} page for more details.
+\item sx \verb{Array func| object| bool | func| object} \cr Default is - The system prop that allows defining system overrides as well as additional CSS styles.See the \code{sx} page for more details.
 }
 }
