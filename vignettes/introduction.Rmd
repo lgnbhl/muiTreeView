@@ -300,7 +300,8 @@ ui <- tagList(
     defaultSelectedItems = list(defaultSelectedId), # always in list()
     # By default, selecting a item does not select its children.
     selectionPropagation = list(
-      descendants = TRUE
+      descendants = TRUE, # FALSE by default
+      parents = FALSE # FALSE by default
     ),
     onItemSelectionToggle = setInput(
       inputId = "itemSelection", 
