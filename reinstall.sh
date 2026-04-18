@@ -1,6 +1,3 @@
-#!/bin/sh
-set -eu
-
 # Install the JavaScript dependencies
 yarn --cwd js
 

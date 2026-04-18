@@ -9,9 +9,12 @@ const config = {
     filename: 'x-tree-view.js',
   },
   externals: {
-    react: 'jsmodule["react"]',
+    'react': 'jsmodule["react"]',
     'react-dom': 'jsmodule["react-dom"]',
     '@/shiny.react': 'jsmodule["@/shiny.react"]',
+    '@/muiMaterial': 'jsmodule["@/muiMaterial"]',
+    '@mui/material': 'jsmodule["@mui/material"]',
+    '@mui/utils': 'jsmodule["@mui/utils"]'
   },
   plugins: [new webpack.DefinePlugin({ 'process.env': '{}' })],
   performance: {
