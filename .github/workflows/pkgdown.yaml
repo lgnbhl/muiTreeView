@@ -1,0 +1,89 @@
+# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
+# Builds the pkgdown site and deploys it into the muiTreeView/ subfolder of the
+# lgnbhl/lgnbhl.github.io user site, served at https://felixluginbuhl.com/muiTreeView/
+# (= https://lgnbhl.github.io/muiTreeView/).
+on:
+  push:
+    branches: [main]
+  pull_request:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+name: pkgdown.yaml
+
+permissions: read-all
+
+concurrency:
+  group: pkgdown-${{ github.event_name }}
+  cancel-in-progress: true
+
+jobs:
+  pkgdown:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: r-lib/actions/setup-pandoc@v2.12.1
+
+      - uses: r-lib/actions/setup-r@v2.12.1
+        with:
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2.12.1
+        with:
+          extra-packages: any::pkgdown, any::jsonlite, any::dplyr, any::reactRouter, local::.
+          needs: website
+
+      - name: Build site
+        # new_process = FALSE keeps everything in one R session; install = FALSE
+        # is fine because the previous step already installed the package.
+        # NOTE: deliberately using build_site() rather than
+        # build_site_github_pages() to avoid auto-writing a CNAME from the
+        # `url:` in _pkgdown.yml; the site is deployed into a subfolder of the
+        # lgnbhl.github.io user site, whose own CNAME must not be touched.
+        run: pkgdown::build_site(new_process = FALSE, install = FALSE)
+        shell: Rscript {0}
+
+      # Write access comes from the deploy key on lgnbhl/lgnbhl.github.io, held
+      # here as DEPLOY_PAT (an SSH private key, despite the name). GITHUB_TOKEN
+      # is scoped to this repo only and cannot write to another repo.
+      - name: Check out the site repository
+        if: github.event_name != 'pull_request'
+        uses: actions/checkout@v7
+        with:
+          repository: lgnbhl/lgnbhl.github.io
+          ssh-key: ${{ secrets.DEPLOY_PAT }}
+          path: _target
+
+      # Delete then copy, so a page removed from the site is removed from the
+      # target. Only the muiTreeView/ folder is touched; sibling project folders
+      # (muiMaterial, muiCharts, reactRouter, the personal site, ...) are left untouched.
+      - name: Replace the reference
+        if: github.event_name != 'pull_request'
+        run: |
+          rm -rf _target/muiTreeView
+          cp -a docs _target/muiTreeView
+
+      # Other pipelines push to the same branch, so a push can lose the race.
+      # They write disjoint folders, so rebasing and pushing again is safe.
+      - name: Publish
+        if: github.event_name != 'pull_request'
+        working-directory: _target
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A muiTreeView
+          if git diff --staged --quiet; then
+            echo "the built site is unchanged"
+            exit 0
+          fi
+          git commit -m "Publish muiTreeView reference [skip ci]"
+          for attempt in 1 2 3 4 5; do
+            git push && exit 0
+            sleep $((attempt * 5))
+            git pull --rebase
+          done
+          exit 1
