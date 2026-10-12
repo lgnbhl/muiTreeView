@@ -54,7 +54,9 @@ RichTreeView(
 ## Full documentation
 
 **All the docs with examples are
-[here](https://felixluginbuhl.com/muiTreeView/).**
+[here](https://felixluginbuhl.com/muiTreeView/articles/overview.html).**
+They follow the structure of the [official MUI X Tree View
+documentation](https://mui.com/x/react-tree-view/).
 
 ## Contribute
 

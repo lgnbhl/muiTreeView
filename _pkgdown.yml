@@ -13,22 +13,146 @@ authors:
 llm-docs: true
 
 navbar:
-  left:
-  - text: Home
-    href: index.html
-  - text: Get started
-    href: articles/introduction.html
-  - text: Reference
-    href: reference/index.html
-  - text: News
-    href: news/index.html
+  structure:
+    left: [intro, simple, rich, features, apps, reference, news]
+    right: [linkedin, twitter, github, homepage]
+  components:
+    intro:
+      text: Get started
+      menu:
+      - text: Overview
+        href: articles/overview.html
+      - text: Data frames with asMuiTree()
+        href: articles/data-frames.html
+      - text: llms.txt
+        href: llms.txt
+    simple:
+      text: Simple Tree View
+      menu:
+      - text: Items
+        href: articles/simple-tree-view-items.html
+      - text: Selection
+        href: articles/simple-tree-view-selection.html
+      - text: Expansion
+        href: articles/simple-tree-view-expansion.html
+      - text: Customization
+        href: articles/simple-tree-view-customization.html
+    rich:
+      text: Rich Tree View
+      menu:
+      - text: Items
+        href: articles/rich-tree-view-items.html
+      - text: Selection
+        href: articles/rich-tree-view-selection.html
+      - text: Expansion
+        href: articles/rich-tree-view-expansion.html
+      - text: Customization
+        href: articles/rich-tree-view-customization.html
+      - text: Label editing
+        href: articles/rich-tree-view-editing.html
+    features:
+      text: Main features
+      menu:
+      - text: Tree Item customization
+        href: articles/tree-item-customization.html
+      - text: Accessibility
+        href: articles/accessibility.html
+    apps:
+      text: Apps
+      menu:
+      - text: Shiny
+        href: articles/shiny.html
+      - text: Navigation with reactRouter
+        href: articles/react-router.html
+      - text: Theming
+        href: articles/theming.html
+    reference:
+      text: Reference
+      href: reference/index.html
+    news:
+      text: News
+      href: news/index.html
+    linkedin:
+      icon: fa-linkedin
+      href: https://www.linkedin.com/in/felixluginbuhl
+      aria-label: LinkedIn
+    twitter:
+      icon: fa-twitter
+      href: https://twitter.com/FelixLuginbuhl
+      aria-label: Twitter
+    github:
+      icon: fa-github
+      href: https://github.com/lgnbhl/muiTreeView
+      aria-label: GitHub
+    homepage:
+      icon: fa-home
+      href: http://felixluginbuhl.com
+      aria-label: Felix Luginbuhl's website
 
-  right:
-   - icon: fa-linkedin
-     href: https://www.linkedin.com/in/felixluginbuhl
-   - icon: fa-twitter
-     href: https://twitter.com/FelixLuginbuhl
-   - icon: fa-github
-     href: https://github.com/lgnbhl/muiTreeView
-   - icon: fa-home
-     href: http://felixluginbuhl.com
+articles:
+- title: Get started
+  navbar: ~
+  contents:
+  - overview
+  - data-frames
+- title: Simple Tree View
+  contents:
+  - simple-tree-view-items
+  - simple-tree-view-selection
+  - simple-tree-view-expansion
+  - simple-tree-view-customization
+- title: Rich Tree View
+  contents:
+  - rich-tree-view-items
+  - rich-tree-view-selection
+  - rich-tree-view-expansion
+  - rich-tree-view-customization
+  - rich-tree-view-editing
+- title: Main features
+  contents:
+  - tree-item-customization
+  - accessibility
+- title: Apps
+  contents:
+  - shiny
+  - react-router
+  - theming
+
+reference:
+- title: Tree views
+  desc: The two Tree View components and their items.
+  contents:
+  - SimpleTreeView
+  - RichTreeView
+  - TreeItem
+- title: Data frames
+  desc: Build the `items` of `RichTreeView()` from a data frame.
+  contents:
+  - asMuiTree
+- title: Tree Item parts
+  desc: Components used to build custom Tree Items (see the Tree Item customization article).
+  contents:
+  - TreeItemContent
+  - TreeItemLabel
+  - TreeItemLabelInput
+  - TreeItemCheckbox
+  - TreeItemIcon
+  - TreeItemIconContainer
+  - TreeItemGroupTransition
+  - TreeItemProvider
+  - TreeItemRoot
+- title: Roots and icons
+  contents:
+  - SimpleTreeViewRoot
+  - RichTreeViewRoot
+  - TreeViewCollapseIcon
+  - TreeViewExpandIcon
+- title: Shiny and React glue
+  desc: Dependency helper, printing, and helpers re-exported from `shiny.react`.
+  contents:
+  - muiTreeViewDependency
+  - print.muiTreeView
+  - reexports
+
+redirects:
+  - ["articles/introduction.html", "articles/overview.html"]

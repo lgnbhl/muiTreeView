@@ -1,0 +1,121 @@
+---
+title: "Rich Tree View - Expansion"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Rich Tree View - Expansion}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+> Original MUI X documentation: [Rich Tree View - Expansion](https://mui.com/x/react-tree-view/rich-tree-view/expansion/). The examples of this page are written for R.
+
+```{r setup, message = FALSE}
+library(muiTreeView)
+library(htmltools)
+```
+
+The examples of this page use a selection of the functions of the [**muiMaterial**](https://felixluginbuhl.com/muiMaterial/), [**muiCharts**](https://felixluginbuhl.com/muiCharts/) and [**reactRouter**](https://felixluginbuhl.com/reactRouter/) packages, grouped by package and topic:
+
+```{r}
+to_id <- function(x) gsub("[^a-z0-9]+", "-", tolower(x))
+
+fns <- rbind(
+  data.frame(package = "muiMaterial", group = "Layout", fn = c("Box", "Stack", "Grid")),
+  data.frame(package = "muiMaterial", group = "Inputs", fn = c("Button", "TextField", "Slider", "Switch")),
+  data.frame(package = "muiMaterial", group = "Navigation", fn = c("Link", "Tabs", "Drawer")),
+  data.frame(package = "muiMaterial", group = "Surfaces", fn = c("AppBar", "Toolbar", "Card")),
+  data.frame(package = "muiCharts", group = "Charts", fn = c("BarChart", "LineChart", "PieChart", "Gauge")),
+  data.frame(package = "muiCharts", group = "Building blocks", fn = c("ChartsContainer", "ChartsXAxis", "ChartsLegend", "Toolbar")),
+  data.frame(package = "reactRouter", group = "Routers", fn = c("RouterProvider", "createHashRouter", "createMemoryRouter")),
+  data.frame(package = "reactRouter", group = "Routes", fn = c("Route", "Outlet")),
+  data.frame(package = "reactRouter", group = "Navigation", fn = c("Link", "NavLink", "Navigate")),
+  data.frame(package = "reactRouter", group = "Hooks", fn = c("useParams", "useLoaderData", "useNavigate"))
+)
+# Stable ids, built from the path: "Navigation", "Link" and "Toolbar" exist in two packages
+fns$group_id <- paste(fns$package, to_id(fns$group), sep = "-")
+fns$fn_id <- paste0(fns$package, "::", fns$fn)
+
+fn_items <- asMuiTree(
+  fns,
+  levels = c("package", "group", "fn"),
+  levels_id = c("package", "group_id", "fn_id")
+)
+```
+
+## Default expansion
+
+Use `defaultExpandedItems` to expand items when the tree is created. Always give the ids in a `list()`. The ids can be computed from the data frame, here muiCharts and all its groups: [MUI docs](https://mui.com/x/react-tree-view/rich-tree-view/expansion/#controlled-expansion)
+
+```{r}
+mui_charts <- fns[fns$package == "muiCharts", ]
+
+RichTreeView(
+  items = fn_items,
+  defaultExpandedItems = as.list(unique(c(mui_charts$package, mui_charts$group_id)))
+)
+```
+
+## Controlled expansion
+
+Use `expandedItems` with `onExpandedItemsChange` to control the expansion from your app, for example from the Shiny server with `renderReact()`. See [controlled state in Shiny](shiny.html#controlled-state-from-the-server). [MUI docs](https://mui.com/x/react-tree-view/rich-tree-view/expansion/#controlled-expansion)
+
+`onExpandedItemsChange` receives the ids of all the expanded items. In Shiny, use `onExpandedItemsChange = setInput("expanded", 1)` to get them in `input$expanded`. On this page, a `JS()` function writes them below the tree:
+
+```{r}
+div(
+  RichTreeView(
+    items = fn_items,
+    onExpandedItemsChange = JS(
+      "(event, itemIds) => { document.getElementById('rtv-expanded').textContent = JSON.stringify(itemIds); }"
+    )
+  ),
+  tags$pre("Expanded items: ", tags$span(id = "rtv-expanded", "[]"))
+)
+```
+
+## Track item expansion change
+
+Use `onItemExpansionToggle` to know which item was just expanded or collapsed. It receives the event, the item id and whether the item is now expanded. [MUI docs](https://mui.com/x/react-tree-view/rich-tree-view/expansion/#track-item-expansion-change)
+
+```{r}
+div(
+  RichTreeView(
+    items = fn_items,
+    onItemExpansionToggle = JS(
+      "(event, itemId, isExpanded) => {
+        document.getElementById('rtv-toggle').textContent =
+          itemId + (isExpanded ? ' was expanded' : ' was collapsed');
+      }"
+    )
+  ),
+  tags$pre(tags$span(id = "rtv-toggle", "No item expansion recorded"))
+)
+```
+
+## Limit expansion to icon container
+
+By default, clicking anywhere on an item expands it. Use `expansionTrigger = "iconContainer"` to expand it only when clicking on the arrow icon, so that a click on the label only selects the item. [MUI docs](https://mui.com/x/react-tree-view/rich-tree-view/expansion/#limit-expansion-to-icon-container)
+
+```{r}
+RichTreeView(
+  items = fn_items,
+  expansionTrigger = "iconContainer"
+)
+```
+
+## Imperative API
+
+The MUI imperative API (`apiRef`, to expand an item or check whether it is expanded from JavaScript) relies on a React hook, which is not available from R. [MUI docs](https://mui.com/x/react-tree-view/rich-tree-view/expansion/#imperative-api)
+
+## API
+
+- [`RichTreeView()`](../reference/RichTreeView.html) – [MUI API](https://mui.com/x/api/tree-view/rich-tree-view/)
+- [`TreeItem()`](../reference/TreeItem.html) – [MUI API](https://mui.com/x/api/tree-view/tree-item/)
+- [`asMuiTree()`](../reference/asMuiTree.html)

@@ -1,0 +1,144 @@
+---
+title: "Rich Tree View - Label editing"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Rich Tree View - Label editing}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+> Original MUI X documentation: [Rich Tree View - Label editing](https://mui.com/x/react-tree-view/rich-tree-view/editing/). The examples of this page are written for R.
+
+```{r setup, message = FALSE}
+library(muiTreeView)
+library(htmltools)
+```
+
+The examples of this page use a selection of the functions of the [**muiMaterial**](https://felixluginbuhl.com/muiMaterial/), [**muiCharts**](https://felixluginbuhl.com/muiCharts/) and [**reactRouter**](https://felixluginbuhl.com/reactRouter/) packages, grouped by package and topic. The trees show the packages and their groups:
+
+```{r}
+to_id <- function(x) gsub("[^a-z0-9]+", "-", tolower(x))
+
+fns <- rbind(
+  data.frame(package = "muiMaterial", group = "Layout", fn = c("Box", "Stack", "Grid")),
+  data.frame(package = "muiMaterial", group = "Inputs", fn = c("Button", "TextField", "Slider", "Switch")),
+  data.frame(package = "muiMaterial", group = "Navigation", fn = c("Link", "Tabs", "Drawer")),
+  data.frame(package = "muiMaterial", group = "Surfaces", fn = c("AppBar", "Toolbar", "Card")),
+  data.frame(package = "muiCharts", group = "Charts", fn = c("BarChart", "LineChart", "PieChart", "Gauge")),
+  data.frame(package = "muiCharts", group = "Building blocks", fn = c("ChartsContainer", "ChartsXAxis", "ChartsLegend", "Toolbar")),
+  data.frame(package = "reactRouter", group = "Routers", fn = c("RouterProvider", "createHashRouter", "createMemoryRouter")),
+  data.frame(package = "reactRouter", group = "Routes", fn = c("Route", "Outlet")),
+  data.frame(package = "reactRouter", group = "Navigation", fn = c("Link", "NavLink", "Navigate")),
+  data.frame(package = "reactRouter", group = "Hooks", fn = c("useParams", "useLoaderData", "useNavigate"))
+)
+# Stable ids, built from the path: "Navigation", "Link" and "Toolbar" exist in two packages
+fns$group_id <- paste(fns$package, to_id(fns$group), sep = "-")
+fns$fn_id <- paste0(fns$package, "::", fns$fn)
+
+group_items <- asMuiTree(
+  fns,
+  levels = c("package", "group"),
+  levels_id = c("package", "group_id")
+)
+```
+
+## Enable label editing
+
+Use `isItemEditable = TRUE` to let users edit the labels. Double-click on an item, or focus it and press <kbd>Enter</kbd>, to edit it. Press <kbd>Enter</kbd> or leave the field to save, and <kbd>Escape</kbd> to cancel. [MUI docs](https://mui.com/x/react-tree-view/rich-tree-view/editing/#enable-label-editing)
+
+```{r}
+RichTreeView(
+  items = group_items,
+  isItemEditable = TRUE,
+  defaultExpandedItems = list("muiMaterial")
+)
+```
+
+## Limit editing to some items
+
+Give a JavaScript function to `isItemEditable` to make only some items editable. It receives an item and returns `TRUE` when the item can be edited. Here, the items of the `package` level get an `editable` field in R, so only the packages can be renamed, not the groups: [MUI docs](https://mui.com/x/react-tree-view/rich-tree-view/editing/#limit-editing-to-some-items)
+
+```{r}
+RichTreeView(
+  items = asMuiTree(
+    fns,
+    levels = c("package", "group"),
+    levels_id = c("package", "group_id"),
+    package = list(editable = TRUE)
+  ),
+  isItemEditable = JS("(item) => Boolean(item.editable)"),
+  defaultExpandedItems = list("muiMaterial")
+)
+```
+
+### Limit editing to leaves
+
+To make only the items without children editable, check the `children` field: [MUI docs](https://mui.com/x/react-tree-view/rich-tree-view/editing/#limit-editing-to-leaves)
+
+```{r}
+RichTreeView(
+  items = group_items,
+  isItemEditable = JS("(item) => !item.children || item.children.length === 0"),
+  defaultExpandedItems = list("muiMaterial", "reactRouter")
+)
+```
+
+## Track item label change
+
+Use `onItemLabelChange` to know when a label was edited. It receives the item id and the new label. In Shiny, forward them to the server with `Shiny.setInputValue()`, as in the example below. On this page, which runs without a Shiny server, a `JS()` function writes them below the tree. [MUI docs](https://mui.com/x/react-tree-view/rich-tree-view/editing/#track-item-label-change)
+
+```{r}
+div(
+  RichTreeView(
+    items = group_items,
+    isItemEditable = TRUE,
+    defaultExpandedItems = list("muiMaterial"),
+    onItemLabelChange = JS(
+      "(itemId, label) => {
+        document.getElementById('rtv-label').textContent = itemId + ' renamed to: ' + label;
+      }"
+    )
+  ),
+  tags$pre(tags$span(id = "rtv-label", "No label edited"))
+)
+```
+
+In a Shiny app, update the data frame with the new label. Like every value sent by the browser, validate it on the server:
+
+```r
+RichTreeView(
+  items = group_items,
+  isItemEditable = TRUE,
+  onItemLabelChange = JS(
+    "(itemId, label) => Shiny.setInputValue('labelChange', { itemId, label })"
+  )
+)
+
+# server
+observeEvent(input$labelChange, {
+  change <- input$labelChange
+  req(change$itemId %in% fns$group_id, nchar(change$label) <= 50)
+  ...
+})
+```
+
+## Change the default behavior
+
+Changing how an item saves or validates its label needs a custom item component, written with `JS()` and the `useTreeItemUtils()` hook. See [Rich Tree View - Customization](rich-tree-view-customization.html#custom-tree-item) for how to write one. [MUI docs](https://mui.com/x/react-tree-view/rich-tree-view/editing/#change-the-default-behavior)
+
+## Imperative API
+
+The MUI imperative API (`apiRef`, to change a label or start editing from JavaScript) relies on a React hook, which is not available from R. [MUI docs](https://mui.com/x/react-tree-view/rich-tree-view/editing/#imperative-api)
+
+## API
+
+- [`RichTreeView()`](../reference/RichTreeView.html) – [MUI API](https://mui.com/x/api/tree-view/rich-tree-view/)
+- [`TreeItem()`](../reference/TreeItem.html) – [MUI API](https://mui.com/x/api/tree-view/tree-item/)
+- [`asMuiTree()`](../reference/asMuiTree.html)

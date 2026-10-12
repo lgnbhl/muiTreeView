@@ -1,0 +1,142 @@
+---
+title: "Overview"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Overview}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+> Original MUI X documentation: [Tree View - Overview](https://mui.com/x/react-tree-view/) and [Quickstart](https://mui.com/x/react-tree-view/quickstart/). The examples of this documentation are written for R.
+
+**muiTreeView** gives access to [MUI X Tree View](https://mui.com/x/react-tree-view/) React components, which let users navigate hierarchical lists of data with nested levels that can be expanded and collapsed. It works in Shiny apps, Quarto documents, R Markdown and in static HTML pages.
+
+## Install
+
+``` r
+install.packages("muiTreeView")
+# or the development version
+remotes::install_github("lgnbhl/muiTreeView")
+```
+
+```{r setup, message = FALSE}
+library(muiTreeView)
+```
+
+## Community version only
+
+MUI X Tree View ships in two packages: the free **Community** version (`@mui/x-tree-view`, MIT license) and the commercial **Pro** version (`@mui/x-tree-view-pro`). **muiTreeView** wraps the Community version only, so the Pro features (virtualization, lazy loading, drag and drop ordering) are not available. [MUI docs](https://mui.com/x/react-tree-view/)
+
+## Simple Tree View or Rich Tree View?
+
+The Tree View comes as two components:
+
+- `SimpleTreeView()` takes its items as `TreeItem()` children. It is the natural choice for navigation, such as a sidebar or a file explorer, where you write each item by hand and can put any UI in its label.
+- `RichTreeView()` takes its items as data, through the `items` argument. It is the natural choice for exploring a dataset: build the items from a data frame with `asMuiTree()`.
+
+### Rich Tree View from a data frame
+
+`asMuiTree()` turns the columns of a data frame into the levels of the tree. Here, a selection of the functions of three companion packages, [**muiMaterial**](https://felixluginbuhl.com/muiMaterial/), [**muiCharts**](https://felixluginbuhl.com/muiCharts/) and [**reactRouter**](https://felixluginbuhl.com/reactRouter/), grouped by package and topic:
+
+```{r}
+fns <- rbind(
+  data.frame(package = "muiMaterial", group = "Layout", fn = c("Box", "Stack", "Grid")),
+  data.frame(package = "muiMaterial", group = "Inputs", fn = c("Button", "TextField", "Slider", "Switch")),
+  data.frame(package = "muiMaterial", group = "Navigation", fn = c("Link", "Tabs", "Drawer")),
+  data.frame(package = "muiMaterial", group = "Surfaces", fn = c("AppBar", "Toolbar", "Card")),
+  data.frame(package = "muiCharts", group = "Charts", fn = c("BarChart", "LineChart", "PieChart", "Gauge")),
+  data.frame(package = "muiCharts", group = "Building blocks", fn = c("ChartsContainer", "ChartsXAxis", "ChartsLegend", "Toolbar")),
+  data.frame(package = "reactRouter", group = "Routers", fn = c("RouterProvider", "createHashRouter", "createMemoryRouter")),
+  data.frame(package = "reactRouter", group = "Routes", fn = c("Route", "Outlet")),
+  data.frame(package = "reactRouter", group = "Navigation", fn = c("Link", "NavLink", "Navigate")),
+  data.frame(package = "reactRouter", group = "Hooks", fn = c("useParams", "useLoaderData", "useNavigate"))
+)
+head(fns)
+
+RichTreeView(
+  items = asMuiTree(fns)
+)
+```
+
+See [Data frames with asMuiTree()](data-frames.html) for stable ids, extra fields and tibbles. [MUI docs](https://mui.com/x/react-tree-view/rich-tree-view/items/#basic-usage)
+
+### Simple Tree View for navigation
+
+```{r}
+SimpleTreeView(
+  defaultExpandedItems = list("muiMaterial"),
+  TreeItem(
+    itemId = "muiMaterial",
+    label = "muiMaterial",
+    TreeItem(itemId = "muiMaterial::Button", label = "Button()"),
+    TreeItem(itemId = "muiMaterial::TextField", label = "TextField()"),
+    TreeItem(itemId = "muiMaterial::Drawer", label = "Drawer()")
+  ),
+  TreeItem(
+    itemId = "muiCharts",
+    label = "muiCharts",
+    TreeItem(itemId = "muiCharts::BarChart", label = "BarChart()"),
+    TreeItem(itemId = "muiCharts::LineChart", label = "LineChart()")
+  ),
+  TreeItem(
+    itemId = "reactRouter",
+    label = "reactRouter",
+    TreeItem(itemId = "reactRouter::RouterProvider", label = "RouterProvider()"),
+    TreeItem(itemId = "reactRouter::Route", label = "Route()"),
+    TreeItem(itemId = "reactRouter::NavLink", label = "NavLink()")
+  )
+)
+```
+
+[MUI docs](https://mui.com/x/react-tree-view/simple-tree-view/items/#basics)
+
+## Main features
+
+```{r}
+RichTreeView(
+  items = asMuiTree(fns),
+  checkboxSelection = TRUE,
+  multiSelect = TRUE
+)
+```
+
+| Feature | Simple Tree View | Rich Tree View |
+|---|---|---|
+| Items | [Items](simple-tree-view-items.html) | [Items](rich-tree-view-items.html) |
+| Selection | [Selection](simple-tree-view-selection.html) | [Selection](rich-tree-view-selection.html) |
+| Expansion | [Expansion](simple-tree-view-expansion.html) | [Expansion](rich-tree-view-expansion.html) |
+| Customization | [Customization](simple-tree-view-customization.html) | [Customization](rich-tree-view-customization.html) |
+| Label editing | – | [Label editing](rich-tree-view-editing.html) |
+
+The [Tree Item customization](tree-item-customization.html) and [Accessibility](accessibility.html) pages apply to both components.
+
+## In an app
+
+- [Shiny](shiny.html): send the selection, expansion and clicks to the server with `setInput()`.
+- [reactRouter](react-router.html): use a tree view as the navigation of a multi-page app, without a Shiny server.
+- [Theming](theming.html): use a muiMaterial theme, dark mode, and avoid Bootstrap conflicts.
+
+Every exported function also has a runnable Shiny example:
+
+```r
+list.files(system.file("examples", package = "muiTreeView"))
+source(system.file("examples/RichTreeView.R", package = "muiTreeView"))
+```
+
+## Use other MUI products
+
+MUI X Tree View is developed by MUI, the company behind the popular React framework Material UI. **muiTreeView** is a companion to the R package [**muiMaterial**](https://felixluginbuhl.com/muiMaterial/), which provides access to all Material UI components from R.
+
+## API
+
+- [`SimpleTreeView()`](../reference/SimpleTreeView.html) – [MUI API](https://mui.com/x/api/tree-view/simple-tree-view/)
+- [`RichTreeView()`](../reference/RichTreeView.html) – [MUI API](https://mui.com/x/api/tree-view/rich-tree-view/)
+- [`TreeItem()`](../reference/TreeItem.html) – [MUI API](https://mui.com/x/api/tree-view/tree-item/)
+- [`asMuiTree()`](../reference/asMuiTree.html)

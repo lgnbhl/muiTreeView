@@ -1,0 +1,137 @@
+---
+title: "Tree Item customization"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Tree Item customization}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+> Original MUI X documentation: [Tree Item customization](https://mui.com/x/react-tree-view/tree-item-customization/). The examples of this page are written for R.
+
+```{r setup, message = FALSE}
+library(muiTreeView)
+library(htmltools)
+```
+
+## Anatomy
+
+Each Tree Item is made of parts, called slots: the `content` that wraps the row, the `iconContainer` with the expand and collapse icons, the `checkbox`, the `label` (and the `labelInput` when editing), and the `groupTransition` that wraps the children. [MUI docs](https://mui.com/x/react-tree-view/tree-item-customization/#anatomy)
+
+```html
+<li class="MuiTreeItem-root">
+  <div class="MuiTreeItem-content">
+    <div class="MuiTreeItem-iconContainer"></div>
+    <button class="MuiTreeItem-checkbox"></button>
+    <div class="MuiTreeItem-label"></div>
+  </div>
+  <ul class="MuiTreeItem-groupTransition"></ul>
+</li>
+```
+
+Use `slotProps` to pass arguments, such as `sx` styles, to a slot, and `slots` to replace it with your own component.
+
+### Content
+
+Style the content of one item with `slotProps = list(content = ...)`. [MUI docs](https://mui.com/x/react-tree-view/tree-item-customization/#content)
+
+```{r}
+SimpleTreeView(
+  TreeItem(
+    itemId = "muiMaterial",
+    label = "muiMaterial",
+    slotProps = list(content = list(sx = list(bgcolor = "action.hover", borderRadius = 2)))
+  ),
+  TreeItem(itemId = "muiCharts", label = "muiCharts"),
+  TreeItem(itemId = "reactRouter", label = "reactRouter")
+)
+```
+
+### Label
+
+Pass arguments to the label of an item with `slotProps = list(label = ...)`, for example an `id` to reference it, or styles. [MUI docs](https://mui.com/x/react-tree-view/tree-item-customization/#label)
+
+```{r}
+SimpleTreeView(
+  TreeItem(
+    itemId = "muiMaterial",
+    label = "muiMaterial",
+    slotProps = list(label = list(id = "muiMaterial-label", sx = list(fontStyle = "italic")))
+  ),
+  TreeItem(itemId = "muiCharts", label = "muiCharts")
+)
+```
+
+### Checkbox
+
+The checkbox is shown when `checkboxSelection = TRUE`. Style it with `slotProps = list(checkbox = ...)`. [MUI docs](https://mui.com/x/react-tree-view/tree-item-customization/#checkbox)
+
+```{r}
+SimpleTreeView(
+  checkboxSelection = TRUE,
+  multiSelect = TRUE,
+  TreeItem(
+    itemId = "muiMaterial",
+    label = "muiMaterial",
+    slotProps = list(checkbox = list(size = "small", color = "secondary"))
+  ),
+  TreeItem(
+    itemId = "muiCharts",
+    label = "muiCharts",
+    slotProps = list(checkbox = list(size = "small", color = "secondary"))
+  )
+)
+```
+
+### Icon
+
+Replace the icon of one item with `slots = list(icon = ...)`, a React component written with `JS()`:
+
+```{r}
+SimpleTreeView(
+  TreeItem(itemId = "muiMaterial", label = "muiMaterial", slots = list(icon = JS("() => '★'"))),
+  TreeItem(itemId = "muiCharts", label = "muiCharts", slots = list(icon = JS("() => '◆'"))),
+  TreeItem(itemId = "reactRouter", label = "reactRouter")
+)
+```
+
+To style all the items of a tree at once, use the `sx` argument of the tree with the CSS classes of the slots (`.MuiTreeItem-content`, `.MuiTreeItem-label`…), as shown in [Simple Tree View - Customization](simple-tree-view-customization.html#custom-styling). With `RichTreeView()`, use `slotProps = list(item = ...)`, as shown in [Rich Tree View - Customization](rich-tree-view-customization.html#style-some-items-with-slotprops).
+
+## Basics
+
+### Change nested item's indentation
+
+Use `itemChildrenIndentation` to change the indentation of the children, 12px by default. [MUI docs](https://mui.com/x/react-tree-view/tree-item-customization/#change-nested-items-indentation)
+
+```{r}
+fns <- data.frame(
+  package = c("muiMaterial", "muiMaterial", "muiCharts", "muiCharts", "reactRouter", "reactRouter"),
+  fn = c("Button", "Drawer", "BarChart", "PieChart", "Route", "NavLink")
+)
+
+RichTreeView(
+  items = asMuiTree(fns),
+  itemChildrenIndentation = 32
+)
+```
+
+The indentation is also available as the `--TreeView-itemChildrenIndentation` CSS variable, for example to align custom content with the items.
+
+## Hooks
+
+The hooks `useTreeItem()`, `useTreeItemUtils()` and `useTreeItemModel()` let you build your own Tree Item in React. From R, they can be used inside a component written with `JS()`, where `jsmodule['@mui/x-tree-view']` gives access to them. [Rich Tree View - Customization](rich-tree-view-customization.html#custom-tree-item) shows an item that uses `useTreeItemModel()` to read the data of the item. [MUI docs](https://mui.com/x/react-tree-view/tree-item-customization/#hooks)
+
+## API
+
+- [`TreeItem()`](../reference/TreeItem.html) – [MUI API](https://mui.com/x/api/tree-view/tree-item/)
+- [`TreeItemIcon()`](../reference/TreeItemIcon.html) – [MUI API](https://mui.com/x/api/tree-view/tree-item-icon/)
+- [`TreeItemProvider()`](../reference/TreeItemProvider.html) – [MUI API](https://mui.com/x/api/tree-view/tree-item-provider/)
+- [`SimpleTreeView()`](../reference/SimpleTreeView.html) – [MUI API](https://mui.com/x/api/tree-view/simple-tree-view/)
+- [`RichTreeView()`](../reference/RichTreeView.html) – [MUI API](https://mui.com/x/api/tree-view/rich-tree-view/)

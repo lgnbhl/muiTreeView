@@ -1,0 +1,284 @@
+---
+title: "Navigation with reactRouter"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Navigation with reactRouter}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = requireNamespace("reactRouter", quietly = TRUE)
+)
+```
+
+This page is specific to R. A tree view is a natural navigation for an app with many pages, like the sidebar of the [MUI docs](https://mui.com/x/react-tree-view/). The [**reactRouter**](https://felixluginbuhl.com/reactRouter/) package adds URL routing to Shiny apps, Quarto documents and static HTML pages. Combined with **muiTreeView**, it creates multi-page apps without a Shiny server: the demos of this page run in your browser.
+
+``` r
+install.packages("reactRouter")
+```
+
+```{r setup, message = FALSE}
+library(muiTreeView)
+library(reactRouter)
+library(muiMaterial)
+library(htmltools)
+```
+
+## Tree as sidebar navigation
+
+Put a `NavLink()` in the label of each `TreeItem()`, and an `Outlet()` where the page should be shown. Each child `Route()` defines a page. [MUI docs](https://mui.com/x/react-tree-view/simple-tree-view/items/#item-label)
+
+```{r}
+# A link that fills the whole label, so that a click anywhere on it navigates
+nav_link <- function(to, label) {
+  NavLink(
+    to = to,
+    style = list(display = "block", color = "inherit", textDecoration = "none"),
+    label
+  )
+}
+
+page <- function(title, ...) {
+  Box(Typography(title, variant = "h5", gutterBottom = TRUE), ...)
+}
+
+RouterProvider(
+  router = createMemoryRouter(
+    Route(
+      path = "/",
+      element = Paper(
+        variant = "outlined",
+        sx = list(display = "flex", minHeight = 260),
+        Box(
+          sx = list(width = 220, borderRight = 1, borderColor = "divider", p = 1),
+          SimpleTreeView(
+            defaultExpandedItems = list("components"),
+            defaultSelectedItems = "home",
+            TreeItem(itemId = "home", label = nav_link("/", "Home")),
+            TreeItem(
+              itemId = "components",
+              label = "Components",
+              TreeItem(itemId = "simple", label = nav_link("/simple-tree-view", "Simple Tree View")),
+              TreeItem(itemId = "rich", label = nav_link("/rich-tree-view", "Rich Tree View"))
+            ),
+            TreeItem(itemId = "about", label = nav_link("/about", "About"))
+          )
+        ),
+        Box(sx = list(p = 2, flexGrow = 1), Outlet())
+      ),
+      Route(
+        index = TRUE,
+        element = page("Home", Typography("Pick a page in the tree."))
+      ),
+      Route(
+        path = "simple-tree-view",
+        element = page("Simple Tree View", Typography("Items are TreeItem() children."))
+      ),
+      Route(
+        path = "rich-tree-view",
+        element = page("Rich Tree View", Typography("Items are data, built with asMuiTree()."))
+      ),
+      Route(
+        path = "about",
+        element = page("About", Typography("muiTreeView wraps MUI X Tree View for R."))
+      )
+    )
+  )
+)
+```
+
+On this page, `createMemoryRouter()` keeps the current page in memory, so that several demos can live on the same page. In an app, use `createHashRouter()` instead: the URL then shows the current page (e.g. `/#/about`), which users can bookmark and share. See [Router selection](https://felixluginbuhl.com/reactRouter/) in the reactRouter docs.
+
+## Nested routes and dynamic segments
+
+A folder of the tree can match a route with a dynamic segment, such as `docs/:file`: one route displays all the files, and `useParams()` reads the file name from the URL.
+
+```{r}
+RouterProvider(
+  router = createMemoryRouter(
+    Route(
+      path = "/",
+      element = Paper(
+        variant = "outlined",
+        sx = list(display = "flex", minHeight = 200),
+        Box(
+          sx = list(width = 220, borderRight = 1, borderColor = "divider", p = 1),
+          SimpleTreeView(
+            defaultExpandedItems = list("docs"),
+            TreeItem(
+              itemId = "docs",
+              label = "docs",
+              TreeItem(itemId = "readme", label = nav_link("/docs/README.md", "README.md")),
+              TreeItem(itemId = "news", label = nav_link("/docs/NEWS.md", "NEWS.md")),
+              TreeItem(itemId = "license", label = nav_link("/docs/LICENSE.md", "LICENSE.md"))
+            )
+          )
+        ),
+        Box(sx = list(p = 2, flexGrow = 1), Outlet())
+      ),
+      Route(index = TRUE, element = Typography("Open a file.")),
+      Route(
+        path = "docs/:file",
+        element = Typography("You opened ", useParams(tags$code(), selector = "file"))
+      )
+    )
+  )
+)
+```
+
+## Pages from a data frame
+
+The navigation can also be built from a data frame, with one page per row. Here, one reference page per function of the muiMaterial, muiCharts and reactRouter packages, grouped by package: the tree is built with `split()` and `lapply()`, as in [Simple Tree View - Items](simple-tree-view-items.html#build-items-from-a-data-frame), and the route `reference/:package/:fn` shows the row of the selected function. The data frame is given to the route `loader` as JSON with `jsonlite::toJSON()`.
+
+```{r}
+fns <- rbind(
+  data.frame(package = "muiMaterial", group = "Layout", fn = c("Box", "Stack", "Grid")),
+  data.frame(package = "muiMaterial", group = "Inputs", fn = c("Button", "TextField", "Slider", "Switch")),
+  data.frame(package = "muiMaterial", group = "Navigation", fn = c("Link", "Tabs", "Drawer")),
+  data.frame(package = "muiCharts", group = "Charts", fn = c("BarChart", "LineChart", "PieChart", "Gauge")),
+  data.frame(package = "muiCharts", group = "Building blocks", fn = c("ChartsContainer", "ChartsXAxis", "ChartsLegend")),
+  data.frame(package = "reactRouter", group = "Routes", fn = c("RouterProvider", "Route", "Outlet")),
+  data.frame(package = "reactRouter", group = "Navigation", fn = c("Link", "NavLink", "Navigate")),
+  data.frame(package = "reactRouter", group = "Hooks", fn = c("useParams", "useLoaderData", "useNavigate"))
+)
+fns$call <- paste0(fns$package, "::", fns$fn, "()")
+head(fns)
+
+fns_by_package <- split(fns, fns$package)
+
+fn_tree <- SimpleTreeView(
+  lapply(names(fns_by_package), function(package) {
+    rows <- fns_by_package[[package]]
+    TreeItem(
+      itemId = package,
+      label = package,
+      lapply(seq_len(nrow(rows)), function(i) {
+        TreeItem(
+          itemId = paste0(package, "::", rows$fn[i]),
+          label = nav_link(paste0("/reference/", package, "/", rows$fn[i]), rows$fn[i])
+        )
+      })
+    )
+  })
+)
+
+RouterProvider(
+  router = createMemoryRouter(
+    Route(
+      path = "/",
+      element = Paper(
+        variant = "outlined",
+        sx = list(display = "flex", height = 320),
+        Box(
+          sx = list(width = 220, borderRight = 1, borderColor = "divider", p = 1, overflowY = "auto"),
+          fn_tree
+        ),
+        Box(sx = list(p = 2, flexGrow = 1), Outlet())
+      ),
+      Route(index = TRUE, element = Typography("Pick a function in the tree.")),
+      Route(
+        path = "reference/:package/:fn",
+        loader = JS(sprintf(
+          "({ params }) => %s.find((row) => row.package === params.package && row.fn === params.fn)",
+          jsonlite::toJSON(fns, dataframe = "rows")
+        )),
+        element = Box(
+          useLoaderData(Typography(variant = "h5", component = "code"), selector = "call"),
+          Typography("Package: ", useLoaderData(tags$b(), selector = "package")),
+          Typography("Group: ", useLoaderData(tags$b(), selector = "group"))
+        )
+      )
+    )
+  )
+)
+```
+
+`Link` exists in muiMaterial and in reactRouter: the route matches both the package and the function name, so each one gets its own page.
+
+## Rich Tree View items from a loader
+
+A route `loader` can also provide the `items` of a `RichTreeView()`, with `useLoaderData(as = "items")`. Here the items are created in R with `asMuiTree()`, but the loader could also `fetch()` them from an API. See [Data loader](https://felixluginbuhl.com/reactRouter/) in the reactRouter docs.
+
+```{r}
+fns$fn_id <- paste0(fns$package, "::", fns$fn)
+fn_items <- asMuiTree(fns, levels = c("package", "fn"), levels_id = c("package", "fn_id"))
+
+RouterProvider(
+  router = createMemoryRouter(
+    Route(
+      path = "/",
+      loader = JS(sprintf(
+        "async () => %s",
+        jsonlite::toJSON(fn_items, auto_unbox = TRUE)
+      )),
+      hydrateFallbackElement = Typography("Loading..."),
+      element = useLoaderData(
+        RichTreeView(checkboxSelection = TRUE, multiSelect = TRUE),
+        as = "items"
+      )
+    )
+  )
+)
+```
+
+## With Shiny
+
+reactRouter also works in Shiny apps: the routes render `uiOutput()`s or any other component, such as a [**muiCharts**](https://felixluginbuhl.com/muiCharts/) chart, and `session$clientData$url_hash` gives the current page. Use `createHashRouter()`. See the [reactRouter docs](https://felixluginbuhl.com/reactRouter/) for more.
+
+```r
+library(shiny)
+library(muiTreeView)
+library(muiCharts)
+library(reactRouter)
+
+nav_link <- function(to, label) {
+  NavLink(
+    to = to,
+    style = list(display = "block", color = "inherit", textDecoration = "none"),
+    label
+  )
+}
+
+ui <- RouterProvider(
+  router = createHashRouter(
+    Route(
+      path = "/",
+      element = div(
+        style = "display: flex; gap: 16px;",
+        SimpleTreeView(
+          TreeItem(itemId = "home", label = nav_link("/", "Home")),
+          TreeItem(itemId = "chart", label = nav_link("/chart", "Chart"))
+        ),
+        div(style = "flex: 1;", Outlet())
+      ),
+      Route(index = TRUE, element = uiOutput("home")),
+      Route(
+        path = "chart",
+        element = BarChart(
+          dataset = head(starwars_people, 4),
+          xAxis = list(list(scaleType = "band", dataKey = "name")),
+          series = list(list(dataKey = "height", label = "Height")),
+          width = 500,
+          height = 300
+        )
+      )
+    )
+  )
+)
+
+server <- function(input, output, session) {
+  output$home <- renderUI(p("Current page: ", session$clientData$url_hash))
+}
+
+shinyApp(ui, server)
+```
+
+## API
+
+- [`SimpleTreeView()`](../reference/SimpleTreeView.html) – [MUI API](https://mui.com/x/api/tree-view/simple-tree-view/)
+- [`TreeItem()`](../reference/TreeItem.html) – [MUI API](https://mui.com/x/api/tree-view/tree-item/)
+- [reactRouter reference](https://felixluginbuhl.com/reactRouter/reference/index.html)

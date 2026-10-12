@@ -1,0 +1,116 @@
+---
+title: "Simple Tree View - Expansion"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Simple Tree View - Expansion}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+> Original MUI X documentation: [Simple Tree View - Expansion](https://mui.com/x/react-tree-view/simple-tree-view/expansion/). The examples of this page are written for R.
+
+```{r setup, message = FALSE}
+library(muiTreeView)
+library(htmltools)
+
+# Some functions of muiMaterial, muiCharts and reactRouter, used in all the examples of this page
+pkg_items <- function() {
+  list(
+    TreeItem(
+      itemId = "muiMaterial",
+      label = "muiMaterial",
+      TreeItem(itemId = "muiMaterial::Button", label = "Button()"),
+      TreeItem(itemId = "muiMaterial::TextField", label = "TextField()"),
+      TreeItem(itemId = "muiMaterial::Drawer", label = "Drawer()")
+    ),
+    TreeItem(
+      itemId = "muiCharts",
+      label = "muiCharts",
+      TreeItem(itemId = "muiCharts::BarChart", label = "BarChart()"),
+      TreeItem(itemId = "muiCharts::LineChart", label = "LineChart()")
+    ),
+    TreeItem(
+      itemId = "reactRouter",
+      label = "reactRouter",
+      TreeItem(itemId = "reactRouter::RouterProvider", label = "RouterProvider()"),
+      TreeItem(itemId = "reactRouter::Route", label = "Route()"),
+      TreeItem(itemId = "reactRouter::NavLink", label = "NavLink()")
+    )
+  )
+}
+```
+
+## Default expansion
+
+Use `defaultExpandedItems` to expand items when the tree is created. Always give the ids in a `list()`. [MUI docs](https://mui.com/x/react-tree-view/simple-tree-view/expansion/#controlled-expansion)
+
+```{r}
+SimpleTreeView(
+  defaultExpandedItems = list("muiMaterial", "reactRouter"),
+  pkg_items()
+)
+```
+
+## Controlled expansion
+
+Use `expandedItems` with `onExpandedItemsChange` to control the expansion from your app, for example from the Shiny server with `renderReact()`. See [controlled state in Shiny](shiny.html#controlled-state-from-the-server). [MUI docs](https://mui.com/x/react-tree-view/simple-tree-view/expansion/#controlled-expansion)
+
+`onExpandedItemsChange` receives the ids of all the expanded items. In Shiny, use `onExpandedItemsChange = setInput("expanded", 1)` to get them in `input$expanded`. On this page, a `JS()` function writes them below the tree:
+
+```{r}
+div(
+  SimpleTreeView(
+    onExpandedItemsChange = JS(
+      "(event, itemIds) => { document.getElementById('stv-expanded').textContent = JSON.stringify(itemIds); }"
+    ),
+    pkg_items()
+  ),
+  tags$pre("Expanded items: ", tags$span(id = "stv-expanded", "[]"))
+)
+```
+
+## Track item expansion change
+
+Use `onItemExpansionToggle` to know which item was just expanded or collapsed. It receives the event, the item id and whether the item is now expanded. [MUI docs](https://mui.com/x/react-tree-view/simple-tree-view/expansion/#track-item-expansion-change)
+
+```{r}
+div(
+  SimpleTreeView(
+    onItemExpansionToggle = JS(
+      "(event, itemId, isExpanded) => {
+        document.getElementById('stv-toggle').textContent =
+          itemId + (isExpanded ? ' was expanded' : ' was collapsed');
+      }"
+    ),
+    pkg_items()
+  ),
+  tags$pre(tags$span(id = "stv-toggle", "No item expansion recorded"))
+)
+```
+
+## Limit expansion to icon container
+
+By default, clicking anywhere on an item expands it. Use `expansionTrigger = "iconContainer"` to expand it only when clicking on the arrow icon, so that a click on the label only selects the item. [MUI docs](https://mui.com/x/react-tree-view/simple-tree-view/expansion/#limit-expansion-to-icon-container)
+
+```{r}
+SimpleTreeView(
+  expansionTrigger = "iconContainer",
+  pkg_items()
+)
+```
+
+## Imperative API
+
+The MUI imperative API (`apiRef`, to expand an item or check whether it is expanded from JavaScript) relies on a React hook, which is not available from R. [MUI docs](https://mui.com/x/react-tree-view/simple-tree-view/expansion/#imperative-api)
+
+## API
+
+- [`SimpleTreeView()`](../reference/SimpleTreeView.html) – [MUI API](https://mui.com/x/api/tree-view/simple-tree-view/)
+- [`TreeItem()`](../reference/TreeItem.html) – [MUI API](https://mui.com/x/api/tree-view/tree-item/)

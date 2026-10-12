@@ -1,0 +1,201 @@
+---
+title: "Rich Tree View - Selection"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Rich Tree View - Selection}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+> Original MUI X documentation: [Rich Tree View - Selection](https://mui.com/x/react-tree-view/rich-tree-view/selection/). The examples of this page are written for R.
+
+```{r setup, message = FALSE}
+library(muiTreeView)
+library(htmltools)
+```
+
+The examples of this page use a selection of the functions of the [**muiMaterial**](https://felixluginbuhl.com/muiMaterial/), [**muiCharts**](https://felixluginbuhl.com/muiCharts/) and [**reactRouter**](https://felixluginbuhl.com/reactRouter/) packages, grouped by package and topic:
+
+```{r}
+to_id <- function(x) gsub("[^a-z0-9]+", "-", tolower(x))
+
+fns <- rbind(
+  data.frame(package = "muiMaterial", group = "Layout", fn = c("Box", "Stack", "Grid")),
+  data.frame(package = "muiMaterial", group = "Inputs", fn = c("Button", "TextField", "Slider", "Switch")),
+  data.frame(package = "muiMaterial", group = "Navigation", fn = c("Link", "Tabs", "Drawer")),
+  data.frame(package = "muiMaterial", group = "Surfaces", fn = c("AppBar", "Toolbar", "Card")),
+  data.frame(package = "muiCharts", group = "Charts", fn = c("BarChart", "LineChart", "PieChart", "Gauge")),
+  data.frame(package = "muiCharts", group = "Building blocks", fn = c("ChartsContainer", "ChartsXAxis", "ChartsLegend", "Toolbar")),
+  data.frame(package = "reactRouter", group = "Routers", fn = c("RouterProvider", "createHashRouter", "createMemoryRouter")),
+  data.frame(package = "reactRouter", group = "Routes", fn = c("Route", "Outlet")),
+  data.frame(package = "reactRouter", group = "Navigation", fn = c("Link", "NavLink", "Navigate")),
+  data.frame(package = "reactRouter", group = "Hooks", fn = c("useParams", "useLoaderData", "useNavigate"))
+)
+# Stable ids, built from the path: "Navigation", "Link" and "Toolbar" exist in two packages
+fns$group_id <- paste(fns$package, to_id(fns$group), sep = "-")
+fns$fn_id <- paste0(fns$package, "::", fns$fn)
+
+fn_items <- asMuiTree(
+  fns,
+  levels = c("package", "group", "fn"),
+  levels_id = c("package", "group_id", "fn_id")
+)
+```
+
+## Single selection
+
+By default, one item can be selected at a time: click on an item, or focus it and press <kbd>Space</kbd>. [MUI docs](https://mui.com/x/react-tree-view/rich-tree-view/selection/#single-selection)
+
+```{r}
+RichTreeView(items = fn_items)
+```
+
+## Multi-selection
+
+Use `multiSelect = TRUE` to select several items: hold <kbd>Ctrl</kbd> (<kbd>⌘ Command</kbd> on macOS) while clicking, or <kbd>Shift</kbd> to select a range. [MUI docs](https://mui.com/x/react-tree-view/rich-tree-view/selection/#multi-selection)
+
+```{r}
+RichTreeView(items = fn_items, multiSelect = TRUE)
+```
+
+## Disable selection
+
+Use `disableSelection = TRUE` to prevent the selection of all items. [MUI docs](https://mui.com/x/react-tree-view/rich-tree-view/selection/#disable-selection)
+
+```{r}
+RichTreeView(items = fn_items, disableSelection = TRUE)
+```
+
+## Checkbox selection
+
+Use `checkboxSelection = TRUE` to render a checkbox next to each item. Combine it with `multiSelect = TRUE` to check several items. [MUI docs](https://mui.com/x/react-tree-view/rich-tree-view/selection/#checkbox-selection)
+
+```{r}
+RichTreeView(items = fn_items, checkboxSelection = TRUE)
+```
+
+```{r}
+RichTreeView(items = fn_items, checkboxSelection = TRUE, multiSelect = TRUE)
+```
+
+## Selectable items
+
+Use `isItemSelectionDisabled` to make some items unselectable; their checkbox is hidden. It is a JavaScript function that receives an item and returns `TRUE` to prevent its selection. Here, only the functions can be selected, not the packages and groups: [MUI docs](https://mui.com/x/react-tree-view/rich-tree-view/selection/#selectable-items)
+
+```{r}
+RichTreeView(
+  items = fn_items,
+  checkboxSelection = TRUE,
+  multiSelect = TRUE,
+  defaultExpandedItems = list("muiCharts", "muiCharts-charts", "muiCharts-building-blocks"),
+  isItemSelectionDisabled = JS("(item) => item.children && item.children.length > 0")
+)
+```
+
+## Default selection
+
+Use `defaultSelectedItems` to select items when the tree is created. With `multiSelect = TRUE`, give the ids in a `list()`. Here, the ids are computed from the data frame: all the React hooks, whose names start with `use`. [MUI docs](https://mui.com/x/react-tree-view/rich-tree-view/selection/#controlled-selection)
+
+```{r}
+hooks <- fns$fn_id[startsWith(fns$fn, "use")]
+hooks
+
+RichTreeView(
+  items = fn_items,
+  checkboxSelection = TRUE,
+  multiSelect = TRUE,
+  defaultExpandedItems = list("reactRouter", "reactRouter-hooks"),
+  defaultSelectedItems = as.list(hooks)
+)
+```
+
+## Controlled selection
+
+Use `selectedItems` with `onSelectedItemsChange` to control the selection from your app, for example from the Shiny server with `renderReact()`. See [controlled state in Shiny](shiny.html#controlled-state-from-the-server). [MUI docs](https://mui.com/x/react-tree-view/rich-tree-view/selection/#controlled-selection)
+
+`onSelectedItemsChange` receives the ids of all the selected items. In Shiny, use `onSelectedItemsChange = setInput("selected", 1)` to get them in `input$selected`, then filter the data frame with them. On this page, a `JS()` function writes them below the tree:
+
+```{r}
+div(
+  RichTreeView(
+    items = fn_items,
+    checkboxSelection = TRUE,
+    multiSelect = TRUE,
+    onSelectedItemsChange = JS(
+      "(event, itemIds) => { document.getElementById('rtv-selected').textContent = JSON.stringify(itemIds); }"
+    )
+  ),
+  tags$pre("Selected items: ", tags$span(id = "rtv-selected", "[]"))
+)
+```
+
+## Track item selection change
+
+Use `onItemSelectionToggle` to know which item was just selected or deselected. It receives the event, the item id and whether the item is now selected. [MUI docs](https://mui.com/x/react-tree-view/rich-tree-view/selection/#track-item-selection-change)
+
+```{r}
+div(
+  RichTreeView(
+    items = fn_items,
+    checkboxSelection = TRUE,
+    multiSelect = TRUE,
+    onItemSelectionToggle = JS(
+      "(event, itemId, isSelected) => {
+        document.getElementById('rtv-toggle').textContent =
+          itemId + (isSelected ? ' was selected' : ' was deselected');
+      }"
+    )
+  ),
+  tags$pre(tags$span(id = "rtv-toggle", "No item selection recorded"))
+)
+```
+
+## Automatic parents and children selection
+
+With `multiSelect = TRUE`, use `selectionPropagation` to select the children of a selected parent (`descendants = TRUE`), and the parent when all its children are selected (`parents = TRUE`). [MUI docs](https://mui.com/x/react-tree-view/rich-tree-view/selection/#automatic-parents-and-children-selection)
+
+```{r}
+RichTreeView(
+  items = fn_items,
+  checkboxSelection = TRUE,
+  multiSelect = TRUE,
+  defaultExpandedItems = list("reactRouter", "reactRouter-navigation"),
+  selectionPropagation = list(descendants = TRUE, parents = TRUE)
+)
+```
+
+### Propagation with disabled items
+
+Disabled items are skipped by the propagation, and they are not needed for their parent to be selected. Here, `Navigate()` is disabled. [MUI docs](https://mui.com/x/react-tree-view/rich-tree-view/selection/#propagation-with-disabled-items)
+
+```{r}
+RichTreeView(
+  items = fn_items,
+  checkboxSelection = TRUE,
+  multiSelect = TRUE,
+  defaultExpandedItems = list("reactRouter", "reactRouter-navigation"),
+  selectionPropagation = list(descendants = TRUE, parents = TRUE),
+  isItemDisabled = JS("(item) => item.id === 'reactRouter::Navigate'")
+)
+```
+
+### Apply propagation on mount
+
+Applying the propagation to the default selection needs a React hook, which is not available from R. Compute the full selection in R instead, as in the [default selection](#default-selection) example above. [MUI docs](https://mui.com/x/react-tree-view/rich-tree-view/selection/#apply-propagation-on-mount)
+
+## Imperative API
+
+The MUI imperative API (`apiRef`, to select an item or read its selection status from JavaScript) relies on a React hook, which is not available from R. [MUI docs](https://mui.com/x/react-tree-view/rich-tree-view/selection/#imperative-api)
+
+## API
+
+- [`RichTreeView()`](../reference/RichTreeView.html) – [MUI API](https://mui.com/x/api/tree-view/rich-tree-view/)
+- [`TreeItem()`](../reference/TreeItem.html) – [MUI API](https://mui.com/x/api/tree-view/tree-item/)
+- [`asMuiTree()`](../reference/asMuiTree.html)

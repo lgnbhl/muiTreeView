@@ -1,0 +1,192 @@
+---
+title: "Rich Tree View - Customization"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Rich Tree View - Customization}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+> Original MUI X documentation: [Rich Tree View - Customization](https://mui.com/x/react-tree-view/rich-tree-view/customization/). The examples of this page are written for R.
+
+```{r setup, message = FALSE}
+library(muiTreeView)
+library(htmltools)
+```
+
+The examples of this page use a selection of the functions of the [**muiMaterial**](https://felixluginbuhl.com/muiMaterial/), [**muiCharts**](https://felixluginbuhl.com/muiCharts/) and [**reactRouter**](https://felixluginbuhl.com/reactRouter/) packages, grouped by package and topic:
+
+```{r}
+to_id <- function(x) gsub("[^a-z0-9]+", "-", tolower(x))
+
+fns <- rbind(
+  data.frame(package = "muiMaterial", group = "Layout", fn = c("Box", "Stack", "Grid")),
+  data.frame(package = "muiMaterial", group = "Inputs", fn = c("Button", "TextField", "Slider", "Switch")),
+  data.frame(package = "muiMaterial", group = "Navigation", fn = c("Link", "Tabs", "Drawer")),
+  data.frame(package = "muiMaterial", group = "Surfaces", fn = c("AppBar", "Toolbar", "Card")),
+  data.frame(package = "muiCharts", group = "Charts", fn = c("BarChart", "LineChart", "PieChart", "Gauge")),
+  data.frame(package = "muiCharts", group = "Building blocks", fn = c("ChartsContainer", "ChartsXAxis", "ChartsLegend", "Toolbar")),
+  data.frame(package = "reactRouter", group = "Routers", fn = c("RouterProvider", "createHashRouter", "createMemoryRouter")),
+  data.frame(package = "reactRouter", group = "Routes", fn = c("Route", "Outlet")),
+  data.frame(package = "reactRouter", group = "Navigation", fn = c("Link", "NavLink", "Navigate")),
+  data.frame(package = "reactRouter", group = "Hooks", fn = c("useParams", "useLoaderData", "useNavigate"))
+)
+# Stable ids, built from the path: "Navigation", "Link" and "Toolbar" exist in two packages
+fns$group_id <- paste(fns$package, to_id(fns$group), sep = "-")
+fns$fn_id <- paste0(fns$package, "::", fns$fn)
+
+head(fns)
+
+fn_items <- asMuiTree(
+  fns,
+  levels = c("package", "group", "fn"),
+  levels_id = c("package", "group_id", "fn_id")
+)
+```
+
+## Basics
+
+### Custom icons
+
+Use the `slots` argument to replace the default icons: `expandIcon`, `collapseIcon`, and `endIcon` for the items without children. A slot expects a React component, which you write with `JS()`. Here, a small helper creates an SVG icon from a [Material icon](https://mui.com/material-ui/material-icons/) path. [MUI docs](https://mui.com/x/react-tree-view/rich-tree-view/customization/#custom-icons)
+
+```{r}
+svg_icon <- function(path) {
+  JS(sprintf(
+    "(props) => React.createElement('svg',
+      { ...props, viewBox: '0 0 24 24', width: 16, height: 16, fill: 'currentColor' },
+      React.createElement('path', { d: '%s' }))",
+    path
+  ))
+}
+
+RichTreeView(
+  items = fn_items,
+  defaultExpandedItems = list("muiCharts", "muiCharts-charts"),
+  slots = list(
+    # Material icons "Folder", "FolderOpen" and "Code"
+    expandIcon = svg_icon("M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8z"),
+    collapseIcon = svg_icon("M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2m0 12H4V8h16z"),
+    endIcon = svg_icon("M9.4 16.6 4.8 12l4.6-4.6L8 6l-6 6 6 6zm5.2 0 4.6-4.6-4.6-4.6L16 6l6 6-6 6z")
+  )
+)
+```
+
+### Custom toggle animations
+
+In the MUI docs, this example needs the Pro version. [MUI docs](https://mui.com/x/react-tree-view/rich-tree-view/customization/#custom-toggle-animations)
+
+### Custom styling
+
+Use the `sx` argument to style the tree. Target the parts of the items with their CSS classes (`.MuiTreeItem-content`, `.MuiTreeItem-label`, `.MuiTreeItem-iconContainer`, `.MuiTreeItem-groupTransition`…) and their state with data attributes (`[data-selected]`, `[data-focused]`, `[data-expanded]`, `[data-disabled]`). Colors such as `"secondary.main"` come from the [theme](theming.html). [MUI docs](https://mui.com/x/react-tree-view/rich-tree-view/customization/#custom-styling)
+
+```{r}
+RichTreeView(
+  items = fn_items,
+  defaultExpandedItems = list("reactRouter"),
+  sx = list(
+    "& .MuiTreeItem-content" = list(borderRadius = 4),
+    "& .MuiTreeItem-content[data-expanded]" = list(fontWeight = "bold"),
+    "& .MuiTreeItem-content[data-selected]" = list(
+      bgcolor = "secondary.main",
+      color = "secondary.contrastText"
+    ),
+    "& .MuiTreeItem-groupTransition" = list(
+      ml = "15px",
+      pl = "18px",
+      borderLeft = "1px dashed",
+      borderColor = "divider"
+    )
+  )
+)
+```
+
+#### Style some items with `slotProps`
+
+`slotProps = list(item = ...)` passes arguments to every `TreeItem()` of the tree. Give a JavaScript function instead of a list to change them per item: it receives the item id. Here, the chart functions of muiCharts, computed from the data frame, are in bold:
+
+```{r}
+charts <- fns$fn_id[endsWith(fns$fn, "Chart")]
+charts
+
+RichTreeView(
+  items = fn_items,
+  defaultExpandedItems = list("muiCharts", "muiCharts-charts", "muiCharts-building-blocks"),
+  slotProps = list(
+    item = JS(sprintf(
+      "({ itemId }) => %s.includes(itemId) ? { sx: { fontWeight: 'bold', color: 'primary.main' } } : {}",
+      jsonlite::toJSON(charts)
+    ))
+  )
+)
+```
+
+### Custom Tree Item
+
+The label of a Rich Tree View item is a string. To render more, build the richer label in R with [muiMaterial](https://felixluginbuhl.com/muiMaterial/) components, store it in another field of each item, and replace the item component with the `item` slot. The slot is written in JavaScript with `JS()`: it reads the item data with the `useTreeItemModel()` hook of MUI and renders a `TreeItem` with this label. [MUI docs](https://mui.com/x/react-tree-view/rich-tree-view/customization/#custom-tree-item)
+
+Here, the number of functions of each package and group is shown in a `Chip`, and the full `package::fn()` call of each function in a `code` element:
+
+```{r, message = FALSE}
+library(muiMaterial)
+
+# Add a richer label to each package, group and function
+add_rich_label <- function(items) {
+  lapply(items, function(item) {
+    if (is.null(item$children)) {
+      row <- fns[fns$fn_id == item$id, ]
+      item$richLabel <- tags$code(paste0(row$package, "::", row$fn, "()"))
+    } else {
+      item$children <- add_rich_label(item$children)
+      n <- sum(fns$package == item$id | fns$group_id == item$id)
+      item$richLabel <- Stack(
+        direction = "row", spacing = 1, alignItems = "center",
+        Box(component = "span", item$label),
+        Chip(size = "small", variant = "outlined", label = paste(n, "functions"))
+      )
+    }
+    item
+  })
+}
+
+RichTreeView(
+  items = add_rich_label(fn_items),
+  defaultExpandedItems = list("muiCharts", "muiCharts-charts"),
+  slots = list(
+    item = JS("React.forwardRef(function RichLabelItem(props, ref) {
+      const { TreeItem, useTreeItemModel } = jsmodule['@mui/x-tree-view'];
+      const item = useTreeItemModel(props.itemId);
+      return React.createElement(TreeItem, { ...props, ref, label: item.richLabel });
+    })")
+  )
+)
+```
+
+The `label` field stays a string, as the Rich Tree View uses it for keyboard navigation. `jsmodule['@mui/x-tree-view']` gives access to all the components and hooks of MUI X Tree View. See [Tree Item customization](tree-item-customization.html) for the parts of an item.
+
+### Headless API
+
+The `useTreeItem()` hook used to build an item from scratch can be used the same way, in a component written with `JS()`. [MUI docs](https://mui.com/x/react-tree-view/rich-tree-view/customization/#headless-api)
+
+### Sticky headers
+
+In the MUI docs, this example needs the Pro version. [MUI docs](https://mui.com/x/react-tree-view/rich-tree-view/customization/#sticky-headers)
+
+## Common examples
+
+### File explorer
+
+A file explorer is a navigation component: see the [Simple Tree View customization](simple-tree-view-customization.html#gmail-clone) and [reactRouter](react-router.html) pages, which build a navigation with `SimpleTreeView()`. [MUI docs](https://mui.com/x/react-tree-view/rich-tree-view/customization/#file-explorer)
+
+## API
+
+- [`RichTreeView()`](../reference/RichTreeView.html) – [MUI API](https://mui.com/x/api/tree-view/rich-tree-view/)
+- [`TreeItem()`](../reference/TreeItem.html) – [MUI API](https://mui.com/x/api/tree-view/tree-item/)
+- [`asMuiTree()`](../reference/asMuiTree.html)

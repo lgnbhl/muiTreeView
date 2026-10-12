@@ -1,0 +1,302 @@
+---
+title: "Shiny"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Shiny}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+This page is specific to R. It shows how to use the Tree View callbacks of the MUI docs, such as [`onSelectedItemsChange`](https://mui.com/x/react-tree-view/rich-tree-view/selection/#controlled-selection) and [`onItemClick`](https://mui.com/x/react-tree-view/rich-tree-view/items/#track-item-clicks), in a Shiny app.
+
+The examples need a Shiny server, so they are not run on this page: copy them into an R session to try them.
+
+## Send a value to Shiny with `setInput()`
+
+Tree View callbacks are JavaScript functions. `setInput(inputId, 1)` creates one that sends an argument of the callback to `input[[inputId]]`. The `1` is the position of the argument, starting from 0: most callbacks receive the event first (position 0), then the ids (position 1).
+
+| Callback | Arguments | Example |
+|---|---|---|
+| `onItemClick` | event, item id | `setInput("clicked", 1)` |
+| `onSelectedItemsChange` | event, selected ids | `setInput("selected", 1)` |
+| `onExpandedItemsChange` | event, expanded ids | `setInput("expanded", 1)` |
+| `onItemFocus` | event, item id | `setInput("focused", 1)` |
+| `onItemLabelChange` | item id, new label | see [Label editing](rich-tree-view-editing.html#track-item-label-change) |
+
+### Filter a data frame with the selection
+
+The most common use: build the tree from a data frame with `asMuiTree()`, and filter the data frame with the selected ids. Use `levels_id` so that the ids are stable and can be matched with the data frame. [MUI docs](https://mui.com/x/react-tree-view/rich-tree-view/selection/#controlled-selection)
+
+```r
+library(shiny)
+library(muiMaterial)
+library(muiTreeView)
+
+to_id <- function(x) gsub("[^a-z0-9]+", "-", tolower(x))
+
+fns <- rbind(
+  data.frame(package = "muiMaterial", group = "Layout", fn = c("Box", "Stack", "Grid")),
+  data.frame(package = "muiMaterial", group = "Inputs", fn = c("Button", "TextField", "Slider", "Switch")),
+  data.frame(package = "muiMaterial", group = "Navigation", fn = c("Link", "Tabs", "Drawer")),
+  data.frame(package = "muiMaterial", group = "Surfaces", fn = c("AppBar", "Toolbar", "Card")),
+  data.frame(package = "muiCharts", group = "Charts", fn = c("BarChart", "LineChart", "PieChart", "Gauge")),
+  data.frame(package = "muiCharts", group = "Building blocks", fn = c("ChartsContainer", "ChartsXAxis", "ChartsLegend", "Toolbar")),
+  data.frame(package = "reactRouter", group = "Routers", fn = c("RouterProvider", "createHashRouter", "createMemoryRouter")),
+  data.frame(package = "reactRouter", group = "Routes", fn = c("Route", "Outlet")),
+  data.frame(package = "reactRouter", group = "Navigation", fn = c("Link", "NavLink", "Navigate")),
+  data.frame(package = "reactRouter", group = "Hooks", fn = c("useParams", "useLoaderData", "useNavigate"))
+)
+# Stable ids, built from the path: "Navigation", "Link" and "Toolbar" exist in two packages
+fns$group_id <- paste(fns$package, to_id(fns$group), sep = "-")
+fns$fn_id <- paste0(fns$package, "::", fns$fn)
+
+fn_items <- asMuiTree(
+  fns,
+  levels = c("package", "group", "fn"),
+  levels_id = c("package", "group_id", "fn_id")
+)
+
+ui <- muiMaterialPage(
+  CssBaseline(),
+  Stack(
+    direction = "row",
+    spacing = 2,
+    sx = list(p = 2),
+    Box(
+      sx = list(minWidth = 280),
+      RichTreeView(
+        items = fn_items,
+        checkboxSelection = TRUE,
+        multiSelect = TRUE,
+        selectionPropagation = list(descendants = TRUE, parents = TRUE),
+        defaultExpandedItems = list("muiCharts"),
+        onSelectedItemsChange = setInput("selected", 1)
+      )
+    ),
+    Box(tableOutput("table"))
+  )
+)
+
+server <- function(input, output, session) {
+  output$table <- renderTable({
+    # Selecting a package or a group selects its functions, thanks to
+    # selectionPropagation; keep only the rows of the selected functions.
+    fns[fns$fn_id %in% input$selected, c("package", "group", "fn")]
+  })
+}
+
+shinyApp(ui, server)
+```
+
+### Track the latest item clicked
+
+With `onItemClick`, Shiny receives the id of each clicked item, even if the selection doesn't change. [MUI docs](https://mui.com/x/react-tree-view/rich-tree-view/items/#track-item-clicks)
+
+```r
+library(shiny)
+library(muiTreeView)
+
+fns <- data.frame(
+  package = c("muiMaterial", "muiMaterial", "muiCharts", "muiCharts", "reactRouter", "reactRouter"),
+  fn = c("Button", "Drawer", "BarChart", "PieChart", "Route", "NavLink")
+)
+
+ui <- tagList(
+  RichTreeView(
+    items = asMuiTree(fns),
+    onItemClick = setInput("clicked", 1)
+  ),
+  verbatimTextOutput("clickedLabel")
+)
+
+server <- function(input, output, session) {
+  output$clickedLabel <- renderPrint({
+    req(input$clicked)
+    # Without levels_id, asMuiTree() creates ids as "<label>-<random number>":
+    # remove the number to get the label back.
+    gsub("-[[:digit:]]*$", "", input$clicked)
+  })
+}
+
+shinyApp(ui, server)
+```
+
+<img src="https://raw.githubusercontent.com/lgnbhl/muiTreeView/refs/heads/main/man/figures/itemSingleClicked.png" alt="Item clicked in a Shiny app" style="padding:1px;border:thin solid black;"/>
+
+### Track the expansion
+
+```r
+RichTreeView(
+  items = fn_items,
+  onExpandedItemsChange = setInput("expanded", 1)
+)
+# server: input$expanded contains the ids of the expanded items
+```
+
+## React to an event with `triggerEvent()`
+
+When the server only needs to know that something happened, not the value, use `triggerEvent()` with `observeEvent()`:
+
+```r
+library(shiny)
+library(muiTreeView)
+
+ui <- tagList(
+  SimpleTreeView(
+    onExpandedItemsChange = triggerEvent("expansionChanged"),
+    TreeItem(
+      itemId = "muiCharts",
+      label = "muiCharts",
+      TreeItem(itemId = "muiCharts::BarChart", label = "BarChart()")
+    ),
+    TreeItem(
+      itemId = "reactRouter",
+      label = "reactRouter",
+      TreeItem(itemId = "reactRouter::Route", label = "Route()")
+    )
+  ),
+  verbatimTextOutput("count")
+)
+
+server <- function(input, output, session) {
+  n <- reactiveVal(0)
+  observeEvent(input$expansionChanged, n(n() + 1))
+  output$count <- renderText(paste("Expansion changes:", n()))
+}
+
+shinyApp(ui, server)
+```
+
+## Controlled state from the server
+
+To change the selection or the expansion from the server, render the tree on the server with `renderReact()` and `reactOutput()`, and pass the state with `selectedItems` or `expandedItems`. Keep the state in a `reactiveVal()` that is also updated when the user clicks on the tree. [MUI docs](https://mui.com/x/react-tree-view/rich-tree-view/selection/#controlled-selection)
+
+```r
+library(shiny)
+library(muiMaterial)
+library(muiTreeView)
+
+fns <- data.frame(
+  package = c("muiMaterial", "muiMaterial", "muiCharts", "muiCharts", "reactRouter", "reactRouter"),
+  fn = c("Button", "Drawer", "BarChart", "PieChart", "Route", "NavLink")
+)
+fns$fn_id <- paste0(fns$package, "::", fns$fn)
+fn_items <- asMuiTree(fns, levels = c("package", "fn"), levels_id = c("package", "fn_id"))
+
+ui <- muiMaterialPage(
+  CssBaseline(),
+  Box(
+    sx = list(p = 2, maxWidth = 400),
+    Stack(
+      direction = "row",
+      spacing = 1,
+      Button.shinyInput("selectCharts", "Select muiCharts", variant = "outlined"),
+      Button.shinyInput("clear", "Clear", variant = "outlined")
+    ),
+    reactOutput("tree")
+  )
+)
+
+server <- function(input, output, session) {
+  selected <- reactiveVal(list())
+
+  # From the user to the server
+  observeEvent(input$selected, selected(input$selected), ignoreNULL = FALSE)
+
+  # From the server to the tree
+  observeEvent(input$selectCharts, {
+    selected(as.list(fns$fn_id[fns$package == "muiCharts"]))
+  })
+  observeEvent(input$clear, selected(list()))
+
+  output$tree <- renderReact({
+    RichTreeView(
+      items = fn_items,
+      checkboxSelection = TRUE,
+      multiSelect = TRUE,
+      defaultExpandedItems = list("muiCharts"),
+      selectedItems = selected(),
+      onSelectedItemsChange = setInput("selected", 1)
+    )
+  })
+}
+
+shinyApp(ui, server)
+```
+
+## Track multiple items with checkbox selection
+
+`onItemSelectionToggle` sends the id of the item that was just toggled. To keep the list of the selected items on the server, add or remove the received id. This reproduces the logic of the [MUI docs](https://mui.com/x/react-tree-view/rich-tree-view/selection/#track-item-selection-change). In most apps, `onSelectedItemsChange`, used above, is simpler.
+
+```r
+library(shiny)
+library(muiTreeView)
+
+fns <- data.frame(
+  package = c("muiMaterial", "muiMaterial", "muiCharts", "muiCharts", "reactRouter", "reactRouter"),
+  fn = c("Button", "Drawer", "BarChart", "PieChart", "Route", "NavLink")
+)
+treeItems <- asMuiTree(fns)
+
+ui <- tagList(
+  RichTreeView(
+    checkboxSelection = TRUE,
+    multiSelect = TRUE,
+    items = treeItems,
+    defaultExpandedItems = list(treeItems[[1]]$id),
+    onItemSelectionToggle = setInput("itemSelection", 1)
+  ),
+  verbatimTextOutput("treeLabel")
+)
+
+server <- function(input, output, session) {
+  selectedItems <- reactiveVal(character())
+
+  observeEvent(input$itemSelection, {
+    id <- input$itemSelection
+    if (id %in% selectedItems()) {
+      selectedItems(setdiff(selectedItems(), id))
+    } else {
+      selectedItems(c(selectedItems(), id))
+    }
+  })
+
+  output$treeLabel <- renderPrint(gsub("-[[:digit:]]*$", "", selectedItems()))
+}
+
+shinyApp(ui, server)
+```
+
+<img src="https://raw.githubusercontent.com/lgnbhl/muiTreeView/refs/heads/main/man/figures/itemMultipleClicked.png" alt="Multiple items clicked in a Shiny app" style="padding:1px;border:thin solid black;"/>
+
+## Navigation
+
+To use a tree view as the navigation of a multi-page Shiny app, see [reactRouter](react-router.html#with-shiny).
+
+## Runnable examples
+
+Every exported function has a runnable Shiny example:
+
+```r
+list.files(system.file("examples", package = "muiTreeView"))
+source(system.file("examples/RichTreeView.R", package = "muiTreeView"))
+```
+
+## Security notes
+
+- Values sent to Shiny with `setInput()`, `triggerEvent()` or `Shiny.setInputValue()` come from the browser and can be forged. Restrictions such as `isItemEditable` or disabled items only apply to the user interface, so validate the received ids and labels on the server, for example with `req(input$selected %in% fns$fn_id)`.
+- `JS()` code runs in the browser of every visitor. Only pass fixed code to it; never build the string with `paste0()` or `glue()` from user input, URL parameters, files or databases. Put the data in the `items` (or other arguments) and read it inside the function, e.g. `getItemLabel = JS("(item) => item.name")`. To embed values computed from your own data, such as a list of ids, serialize them with `jsonlite::toJSON()`, which escapes them, as in [Rich Tree View - Items](rich-tree-view-items.html#disabled-items).
+- Labels given as plain strings are escaped. Never wrap untrusted text in `HTML()`, which is rendered as markup.
+
+## API
+
+- [`setInput()`](../reference/reexports.html), [`triggerEvent()`](../reference/reexports.html), [`renderReact()`](../reference/reexports.html), [`reactOutput()`](../reference/reexports.html)
+- [`RichTreeView()`](../reference/RichTreeView.html) – [MUI API](https://mui.com/x/api/tree-view/rich-tree-view/)
+- [`SimpleTreeView()`](../reference/SimpleTreeView.html) – [MUI API](https://mui.com/x/api/tree-view/simple-tree-view/)

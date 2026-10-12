@@ -1,0 +1,225 @@
+---
+title: "Simple Tree View - Customization"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Simple Tree View - Customization}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+> Original MUI X documentation: [Simple Tree View - Customization](https://mui.com/x/react-tree-view/simple-tree-view/customization/). The examples of this page are written for R.
+
+```{r setup, message = FALSE}
+library(muiTreeView)
+library(muiMaterial)
+library(htmltools)
+
+# Some functions of muiMaterial, muiCharts and reactRouter, used in several examples of this page
+pkg_items <- function() {
+  list(
+    TreeItem(
+      itemId = "muiMaterial",
+      label = "muiMaterial",
+      TreeItem(itemId = "muiMaterial::Button", label = "Button()"),
+      TreeItem(itemId = "muiMaterial::TextField", label = "TextField()"),
+      TreeItem(itemId = "muiMaterial::Drawer", label = "Drawer()")
+    ),
+    TreeItem(
+      itemId = "muiCharts",
+      label = "muiCharts",
+      TreeItem(itemId = "muiCharts::BarChart", label = "BarChart()"),
+      TreeItem(itemId = "muiCharts::LineChart", label = "LineChart()")
+    ),
+    TreeItem(
+      itemId = "reactRouter",
+      label = "reactRouter",
+      TreeItem(itemId = "reactRouter::RouterProvider", label = "RouterProvider()"),
+      TreeItem(itemId = "reactRouter::Route", label = "Route()"),
+      TreeItem(itemId = "reactRouter::NavLink", label = "NavLink()")
+    )
+  )
+}
+```
+
+## Basics
+
+### Custom icons
+
+Use the `slots` argument to replace the default icons: `expandIcon`, `collapseIcon`, and `endIcon` for the items without children. A slot expects a React component, which you write with `JS()`. Here, a small helper creates an SVG icon from a [Material icon](https://mui.com/material-ui/material-icons/) path. [MUI docs](https://mui.com/x/react-tree-view/simple-tree-view/customization/#custom-icons)
+
+```{r}
+svg_icon <- function(path) {
+  JS(sprintf(
+    "(props) => React.createElement('svg',
+      { ...props, viewBox: '0 0 24 24', width: 16, height: 16, fill: 'currentColor' },
+      React.createElement('path', { d: '%s' }))",
+    path
+  ))
+}
+
+plus_square <- svg_icon("M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-8-2h2v-4h4v-2h-4V7h-2v4H7v2h4z")
+minus_square <- svg_icon("M7 11h10v2H7zm12-8H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z")
+close_square <- svg_icon("M19 19H5V5h14v14zM3 3v18h18V3H3zm14 12.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z")
+
+SimpleTreeView(
+  defaultExpandedItems = list("muiMaterial"),
+  slots = list(
+    expandIcon = plus_square,
+    collapseIcon = minus_square,
+    endIcon = close_square
+  ),
+  pkg_items()
+)
+```
+
+The `slots` argument of a `TreeItem()` changes the icons of one item only: see [Tree Item customization](tree-item-customization.html).
+
+### Custom toggle animations
+
+The `groupTransition` slot of a `TreeItem()` changes the animation used to show the children. The MUI demo uses the `react-spring` library, which is not bundled in **muiTreeView**. [MUI docs](https://mui.com/x/react-tree-view/simple-tree-view/customization/#custom-toggle-animations)
+
+### Custom styling
+
+Use the `sx` argument to style the tree. Target the parts of the items with their CSS classes (`.MuiTreeItem-content`, `.MuiTreeItem-label`, `.MuiTreeItem-iconContainer`, `.MuiTreeItem-groupTransition`…) and their state with data attributes (`[data-selected]`, `[data-focused]`, `[data-expanded]`, `[data-disabled]`). Colors such as `"primary.main"` come from the [theme](theming.html). [MUI docs](https://mui.com/x/react-tree-view/simple-tree-view/customization/#custom-styling)
+
+```{r}
+SimpleTreeView(
+  defaultExpandedItems = list("muiMaterial"),
+  sx = list(
+    "& .MuiTreeItem-content" = list(
+      borderRadius = 2,
+      py = 0.5
+    ),
+    "& .MuiTreeItem-label" = list(
+      fontWeight = 500
+    ),
+    "& .MuiTreeItem-content[data-selected]" = list(
+      bgcolor = "primary.main",
+      color = "primary.contrastText"
+    ),
+    "& .MuiTreeItem-iconContainer" = list(
+      bgcolor = "action.hover",
+      borderRadius = "50%"
+    )
+  ),
+  pkg_items()
+)
+```
+
+### Custom Tree Item
+
+Use the `slots` and `slotProps` of `TreeItem()` to customize the parts of an item, or replace them with your own components. See [Tree Item customization](tree-item-customization.html). [MUI docs](https://mui.com/x/react-tree-view/simple-tree-view/customization/#custom-tree-item)
+
+### Headless API
+
+The headless API (`useTreeItem()`) is a React hook. It can be used from R only in a React component written with `JS()`, as shown in [Rich Tree View - Customization](rich-tree-view-customization.html#custom-tree-item). [MUI docs](https://mui.com/x/react-tree-view/simple-tree-view/customization/#headless-api)
+
+## Common examples
+
+### Connection border
+
+Draw a line between the items of a group by styling `.MuiTreeItem-groupTransition`. [MUI docs](https://mui.com/x/react-tree-view/simple-tree-view/customization/#connection-border)
+
+```{r}
+SimpleTreeView(
+  defaultExpandedItems = list("muiMaterial", "reactRouter"),
+  sx = list(
+    "& .MuiTreeItem-groupTransition" = list(
+      ml = "15px",
+      pl = "18px",
+      borderLeft = "1px dashed",
+      borderColor = "divider"
+    )
+  ),
+  pkg_items()
+)
+```
+
+### Gmail clone
+
+A mail navigation with an icon and a counter on each item. The item labels are muiMaterial `Stack()`s. [MUI docs](https://mui.com/x/react-tree-view/simple-tree-view/customization/#gmail-clone)
+
+```{r}
+mail_label <- function(icon, text, count = NULL, color = "text.secondary") {
+  Stack(
+    direction = "row",
+    alignItems = "center",
+    spacing = 1.5,
+    sx = list(py = 0.5),
+    Box(component = "span", sx = list(color = color), shiny::icon(icon)),
+    Typography(text, variant = "body2", sx = list(flexGrow = 1, fontWeight = "inherit")),
+    if (!is.null(count)) Typography(count, variant = "caption", color = "inherit")
+  )
+}
+
+SimpleTreeView(
+  defaultExpandedItems = list("categories"),
+  defaultSelectedItems = "all-mail",
+  sx = list(
+    maxWidth = 360,
+    "& .MuiTreeItem-content" = list(borderRadius = "0 16px 16px 0", pr = 2),
+    "& .MuiTreeItem-content[data-selected]" = list(
+      bgcolor = "primary.light",
+      color = "primary.contrastText",
+      fontWeight = 600
+    )
+  ),
+  TreeItem(itemId = "all-mail", label = mail_label("envelope", "All Mail")),
+  TreeItem(itemId = "trash", label = mail_label("trash", "Trash")),
+  TreeItem(
+    itemId = "categories",
+    label = mail_label("tag", "Categories"),
+    TreeItem(itemId = "social", label = mail_label("users", "Social", "90", "#1a73e8")),
+    TreeItem(itemId = "updates", label = mail_label("circle-info", "Updates", "2,294", "#e3742f")),
+    TreeItem(itemId = "forums", label = mail_label("comments", "Forums", "3,566", "#a250f5")),
+    TreeItem(itemId = "promotions", label = mail_label("tag", "Promotions", "733", "#3c8039"))
+  ),
+  TreeItem(itemId = "history", label = mail_label("clock-rotate-left", "History"))
+)
+```
+
+### Documentation sidebar
+
+The same idea for the sidebar of a documentation website, reusing `mail_label()`: the counters show the number of functions exported by each package, when it is installed.
+
+```{r}
+n_exports <- function(pkg) {
+  if (requireNamespace(pkg, quietly = TRUE)) length(getNamespaceExports(pkg))
+}
+
+SimpleTreeView(
+  defaultExpandedItems = list("reference"),
+  defaultSelectedItems = "get-started",
+  sx = list(
+    maxWidth = 360,
+    "& .MuiTreeItem-content" = list(borderRadius = "0 16px 16px 0", pr = 2),
+    "& .MuiTreeItem-content[data-selected]" = list(
+      bgcolor = "primary.light",
+      color = "primary.contrastText",
+      fontWeight = 600
+    )
+  ),
+  TreeItem(itemId = "get-started", label = mail_label("rocket", "Get started")),
+  TreeItem(
+    itemId = "reference",
+    label = mail_label("book", "Reference"),
+    TreeItem(itemId = "ref-muiMaterial", label = mail_label("cube", "muiMaterial", n_exports("muiMaterial"), "#1976d2")),
+    TreeItem(itemId = "ref-muiCharts", label = mail_label("chart-column", "muiCharts", n_exports("muiCharts"), "#2e7d32")),
+    TreeItem(itemId = "ref-reactRouter", label = mail_label("route", "reactRouter", n_exports("reactRouter"), "#d32f2f"))
+  ),
+  TreeItem(itemId = "articles", label = mail_label("file-lines", "Articles")),
+  TreeItem(itemId = "news", label = mail_label("clock-rotate-left", "Changelog"))
+)
+```
+
+## API
+
+- [`SimpleTreeView()`](../reference/SimpleTreeView.html) – [MUI API](https://mui.com/x/api/tree-view/simple-tree-view/)
+- [`TreeItem()`](../reference/TreeItem.html) – [MUI API](https://mui.com/x/api/tree-view/tree-item/)
