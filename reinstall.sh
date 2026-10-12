@@ -1,8 +1,11 @@
-# Install the JavaScript dependencies
-yarn --cwd js
+#!/bin/sh
+set -eu
 
-# Bundle the JavaScript code into a single file
-yarn --cwd js webpack
+# Install the JavaScript dependencies
+yarn --cwd js install --frozen-lockfile
+
+# Bundle the JavaScript code and regenerate inst/components.txt
+yarn --cwd js build
 
 # Generate the NAMESPACE file and documentation
 Rscript -e 'devtools::document()'

@@ -7,8 +7,18 @@
 muiTreeViewDependency()
 }
 \value{
-HTML dependency object.
+A list of HTML dependency objects (\code{htmltools::htmlDependency})
+  that load the bundled MUI X Tree View JavaScript and its shared MUI Material
+  runtime. The muiMaterial dependency is listed first so its bundle (which
+  provides react, react-dom, \code{@mui/material}, \code{@mui/system} and the
+  emotion runtime that the tree view consumes as externals) loads before the
+  tree view script. Attach it to custom HTML when building a tree view by hand.
 }
 \description{
 Mui X Tree View JS dependency
+}
+\examples{
+# Inspect the dependencies attached to every muiTreeView element.
+muiTreeViewDependency()
+
 }

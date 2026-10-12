@@ -39,31 +39,7 @@
  */
 
 /**
- * @mui/private-theming v7.3.7
- *
- * @license MIT
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
-
-/**
- * @mui/styled-engine v7.3.7
- *
- * @license MIT
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
-
-/**
- * @mui/system v7.3.7
- *
- * @license MIT
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
-
-/**
- * @mui/x-tree-view v8.25.0
+ * @mui/x-tree-view v9.0.2
  *
  * @license MIT
  * This source code is licensed under the MIT license found in the
