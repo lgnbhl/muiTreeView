@@ -1,5 +1,5 @@
 test_that("TreeItemIcon() returns shiny.tag, correct name and value", {
-  expect_equal(class(TreeItemIcon()), "shiny.tag")
+  expect_equal(class(TreeItemIcon()), c("muiTreeView", "shiny.tag"))
   expect_equal(
     environment(TreeItemIcon()[["children"]][[2]])[["data"]][["name"]],
     "TreeItemIcon"

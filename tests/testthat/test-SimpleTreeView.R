@@ -1,5 +1,5 @@
 test_that("SimpleTreeView() returns shiny.tag, correct name and value", {
-  expect_equal(class(SimpleTreeView()), "shiny.tag")
+  expect_equal(class(SimpleTreeView()), c("muiTreeView", "shiny.tag"))
   expect_equal(
     environment(SimpleTreeView()[["children"]][[2]])[["data"]][["name"]],
     "SimpleTreeView"

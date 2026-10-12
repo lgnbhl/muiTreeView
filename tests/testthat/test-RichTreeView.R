@@ -1,5 +1,5 @@
 test_that("RichTreeView() returns shiny.tag, correct name and value", {
-  expect_equal(class(RichTreeView()), "shiny.tag")
+  expect_equal(class(RichTreeView()), c("muiTreeView", "shiny.tag"))
   expect_equal(
     environment(RichTreeView()[["children"]][[2]])[["data"]][["name"]],
     "RichTreeView"
