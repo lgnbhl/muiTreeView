@@ -8,6 +8,13 @@
 #' @param ... Additional arguments passed to print.
 #' @return Invisibly returns x.
 #'
+#' @examples
+#' tree <- RichTreeView(
+#'   items = list(list(id = "1", label = "Item"))
+#' )
+#' # browse = FALSE prints the underlying HTML instead of opening the viewer.
+#' print(tree, browse = FALSE)
+#'
 #' @export
 print.muiTreeView <- function(x, browse = interactive(), ...) {
   if (browse) {
