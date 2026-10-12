@@ -1,7 +1,7 @@
 Package: muiTreeView
 Type: Package
 Title: 'MUI X Tree View' for 'shiny' Apps and 'Quarto'
-Version: 0.1.2
+Version: 0.2.0
 Authors@R: c(
   person(
     given = "Felix", 
