@@ -1,0 +1,49 @@
+The muiTreeView R package is released under the MIT License
+(see the LICENSE file).
+
+The package bundles a pre-built JavaScript file
+('inst/www/muiTreeView/x-tree-view.js') that includes minified
+third-party code. License headers preserved by the bundler are in:
+
+    inst/www/muiTreeView/x-tree-view.js.LICENSE.txt
+
+Bundled third-party libraries
+-----------------------------
+
+  Library                  License  Copyright holder
+  -----------------------  -------  -----------------------------------------
+  @mui/x-tree-view         MIT      Copyright (c) MUI
+  @mui/x-internals         MIT      Copyright (c) MUI
+  @base-ui/utils           MIT      Copyright (c) MUI
+  @mui/system (subpaths)   MIT      Copyright (c) MUI
+  react-is, prop-types,
+    use-sync-external-
+    store                  MIT      Copyright (c) Meta Platforms, Inc.
+                                    and affiliates
+  react-transition-group   BSD-3    Copyright (c) 2018, React Community
+  @babel/runtime           MIT      Copyright (c) 2014-present Sebastian
+                                    McKenzie and other contributors
+  clsx                     MIT      Copyright (c) Luke Edwards
+  reselect                 MIT      Copyright (c) 2015-2018 Reselect
+                                    Contributors
+
+The 'react', 'react-dom', '@mui/material', '@mui/utils',
+'@mui/private-theming', '@mui/styled-engine', '@emotion/react',
+'@emotion/styled' and '@emotion/cache' libraries are declared as
+external dependencies of the bundled JavaScript and are provided at
+runtime by 'shiny.react' and 'muiMaterial'; they are not themselves
+redistributed inside this package. Deep subpath imports of
+'@mui/system' (e.g. ThemeProvider, createStyled) are bundled as
+transitive dependencies of '@mui/x-tree-view'.
+
+Trademark notice
+----------------
+
+"MUI", "Material UI" and "MUI X" are trademarks of MUI Inc.
+The muiTreeView R package is an independent, community-maintained
+wrapper and is not affiliated with, sponsored by, or endorsed by
+MUI Inc. Use of the "MUI" and "MUI X" names is solely to identify
+the third-party JavaScript library that this package wraps. The
+package bundles only the MIT-licensed community 'MUI X Tree View'
+('@mui/x-tree-view'); the commercial 'Pro' tier is not included.
+See https://mui.com/legal/ for MUI's published legal information.
