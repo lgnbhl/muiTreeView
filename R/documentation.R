@@ -125,3 +125,171 @@ NULL
 #' @name TreeItemIcon
 NULL
 
+
+#' RichTreeViewRoot
+#'
+#' @description Styled root element of `RichTreeView()`. See
+#'   \url{https://mui.com/x/react-tree-view/rich-tree-view/customization/}.
+#'
+#' @param ... Props to pass to the component.
+#' @return Object with \code{shiny.tag} class suitable for use in the UI of a Shiny app.
+#'
+#' @md
+#' @name RichTreeViewRoot
+NULL
+
+#' SimpleTreeViewRoot
+#'
+#' @description Styled root element of `SimpleTreeView()`. See
+#'   \url{https://mui.com/x/react-tree-view/simple-tree-view/customization/}.
+#'
+#' @param ... Props to pass to the component.
+#' @return Object with \code{shiny.tag} class suitable for use in the UI of a Shiny app.
+#'
+#' @md
+#' @name SimpleTreeViewRoot
+NULL
+
+#' TreeItemCheckbox
+#'
+#' @description Checkbox slot of a tree item, rendered when
+#'   `checkboxSelection = TRUE`. Building block for customizing `TreeItem()`.
+#'   See \url{https://mui.com/x/react-tree-view/tree-item-customization/}.
+#'
+#' @param ... Props to pass to the component.
+#' @return Object with \code{shiny.tag} class suitable for use in the UI of a Shiny app.
+#'
+#' @md
+#' @name TreeItemCheckbox
+NULL
+
+#' TreeItemContent
+#'
+#' @description Content slot of a tree item (the clickable row). Building
+#'   block for customizing `TreeItem()`. See
+#'   \url{https://mui.com/x/react-tree-view/tree-item-customization/}.
+#'
+#' @param ... Props to pass to the component.
+#' @return Object with \code{shiny.tag} class suitable for use in the UI of a Shiny app.
+#'
+#' @md
+#' @name TreeItemContent
+NULL
+
+#' TreeItemGroupTransition
+#'
+#' @description Transition slot wrapping the children of a tree item.
+#'   Building block for customizing `TreeItem()`. See
+#'   \url{https://mui.com/x/react-tree-view/tree-item-customization/}.
+#'
+#' @param ... Props to pass to the component.
+#' @return Object with \code{shiny.tag} class suitable for use in the UI of a Shiny app.
+#'
+#' @md
+#' @name TreeItemGroupTransition
+NULL
+
+#' TreeItemIconContainer
+#'
+#' @description Icon container slot of a tree item (expand/collapse icon).
+#'   Building block for customizing `TreeItem()`. See
+#'   \url{https://mui.com/x/react-tree-view/tree-item-customization/}.
+#'
+#' @param ... Props to pass to the component.
+#' @return Object with \code{shiny.tag} class suitable for use in the UI of a Shiny app.
+#'
+#' @md
+#' @name TreeItemIconContainer
+NULL
+
+#' TreeItemLabel
+#'
+#' @description Label slot of a tree item. Building block for customizing
+#'   `TreeItem()`. See
+#'   \url{https://mui.com/x/react-tree-view/tree-item-customization/}.
+#'
+#' @param ... Props to pass to the component.
+#' @return Object with \code{shiny.tag} class suitable for use in the UI of a Shiny app.
+#'
+#' @md
+#' @name TreeItemLabel
+NULL
+
+#' TreeItemLabelInput
+#'
+#' @description Input rendered in place of the label when label editing is
+#'   enabled with `isItemEditable`. See
+#'   \url{https://mui.com/x/react-tree-view/rich-tree-view/editing/}.
+#'
+#' @param ... Props to pass to the component.
+#' @return Object with \code{shiny.tag} class suitable for use in the UI of a Shiny app.
+#'
+#' @details
+#' \itemize{
+#' \item value `string` \cr Default is - The value of the input.
+#' \item onChange `func` \cr Default is - Callback fired when the value changes.
+#' \item onKeyDown `func` \cr Default is - Callback fired when a key is pressed.
+#' \item onBlur `func` \cr Default is - Callback fired when the input is blurred.
+#' \item autoFocus `bool` \cr Default is - If TRUE, the input is focused on mount.
+#' }
+#'
+#' @md
+#' @name TreeItemLabelInput
+NULL
+
+#' TreeItemProvider
+#'
+#' @description \url{https://mui.com/x/api/tree-view/tree-item-provider/}
+#'
+#'   Provides the context of a tree item when building a custom tree item.
+#'
+#' @param ... Props to pass to the component.
+#' @return Object with \code{shiny.tag} class suitable for use in the UI of a Shiny app.
+#'
+#' @details
+#' \itemize{
+#' \item children `node` \cr Default is - The content of the component.
+#' \item itemId `string` \cr Default is - The id of the item.
+#' \item id `string` \cr Default is - The id attribute of the item.
+#' }
+#'
+#' @md
+#' @name TreeItemProvider
+NULL
+
+#' TreeItemRoot
+#'
+#' @description Root slot of a tree item. Building block for customizing
+#'   `TreeItem()`. See
+#'   \url{https://mui.com/x/react-tree-view/tree-item-customization/}.
+#'
+#' @param ... Props to pass to the component.
+#' @return Object with \code{shiny.tag} class suitable for use in the UI of a Shiny app.
+#'
+#' @md
+#' @name TreeItemRoot
+NULL
+
+#' TreeViewCollapseIcon
+#'
+#' @description Default icon shown on expanded items (click to collapse). See
+#'   \url{https://mui.com/x/react-tree-view/rich-tree-view/customization/}.
+#'
+#' @param ... Props to pass to the component.
+#' @return Object with \code{shiny.tag} class suitable for use in the UI of a Shiny app.
+#'
+#' @md
+#' @name TreeViewCollapseIcon
+NULL
+
+#' TreeViewExpandIcon
+#'
+#' @description Default icon shown on collapsed items (click to expand). See
+#'   \url{https://mui.com/x/react-tree-view/rich-tree-view/customization/}.
+#'
+#' @param ... Props to pass to the component.
+#' @return Object with \code{shiny.tag} class suitable for use in the UI of a Shiny app.
+#'
+#' @md
+#' @name TreeViewExpandIcon
+NULL

@@ -20,3 +20,11 @@ Invisibly returns x.
 When called interactively, renders the component in the IDE viewer panel.
 Otherwise, falls back to standard shiny.tag printing (raw HTML text).
 }
+\examples{
+tree <- RichTreeView(
+  items = list(list(id = "1", label = "Item"))
+)
+# browse = FALSE prints the underlying HTML instead of opening the viewer.
+print(tree, browse = FALSE)
+
+}
