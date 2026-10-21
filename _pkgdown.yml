@@ -1,21 +1,60 @@
 url: https://felixluginbuhl.com/muiTreeView
 template:
   bootstrap: 5
-  bootswatch: litera
-  ganalytics: UA-158089797-1
+  # Look of felixluginbuhl.com (cream paper, warm ink, DM Sans text, Space
+  # Grotesk headings), as in muiMaterial and muiCharts, with the MUI blue of
+  # the hex logo as primary (a shade darker, so links read at AA on the cream).
   bslib:
-    primary: "#3399ff"
+    primary: "#0059B2"
+    bg: "#FAF6F1"
+    fg: "#3D3229"
+    base_font: {google: "DM Sans"}
+    heading_font: {google: {family: "Space Grotesk", wght: [500, 600, 700]}}
+    code_font: {google: "Fira Code"}
+    border-color: "rgba(28, 25, 23, 0.12)"
+    # Dark mode (light-switch below): the dark scheme of felixluginbuhl.com.
+    body-bg-dark: "#14120F"
+    body-color-dark: "#E8E2DC"
+    body-emphasis-color-dark: "#F5F1EC"
+    body-secondary-color-dark: "#AFA294"
+    body-secondary-bg-dark: "#1C1917"
+    body-tertiary-bg-dark: "#1C1917"
+    border-color-dark: "rgba(232, 226, 220, 0.12)"
+    link-color-dark: "#66B2FF"
+    link-hover-color-dark: "#99CCFF"
+  theme: arrow-dark
+  light-switch: true
+  opengraph:
+    image:
+      src: man/figures/card.png
+      alt: "muiTreeView: MUI X Tree View for Shiny and Quarto"
+  includes:
+    # Roboto for the live demos of the articles (MUI is designed for it).
+    # The rest of the site styles are in pkgdown/extra.css.
+    in_header: |
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
 
 authors:
   Felix Luginbuhl:
     href: "https://felixluginbuhl.com"
+
+# Footer: the package family (the honeycomb of felixluginbuhl.com, in small)
+# and pkgdown's "Developed by" line. The family is a plain link here;
+# pkgdown/extra.js fills it from felixluginbuhl.com/stickers.json, so the
+# list of packages lives in one place. Styles in pkgdown/extra.css.
+footer:
+  structure:
+    left: [family, developed_by]
+    right: built_with
+  components:
+    family: '<nav class="hexfamily" aria-label="More R packages"><a href="https://felixluginbuhl.com/#packages">More R packages</a></nav>'
 
 llm-docs: true
 
 navbar:
   structure:
     left: [intro, simple, rich, features, apps, reference, news]
-    right: [linkedin, twitter, github, homepage]
+    right: [search, lightswitch, github, homepage]
   components:
     intro:
       text: Get started
@@ -72,21 +111,13 @@ navbar:
     news:
       text: News
       href: news/index.html
-    linkedin:
-      icon: fa-linkedin
-      href: https://www.linkedin.com/in/felixluginbuhl
-      aria-label: LinkedIn
-    twitter:
-      icon: fa-twitter
-      href: https://twitter.com/FelixLuginbuhl
-      aria-label: Twitter
     github:
       icon: fa-github
       href: https://github.com/lgnbhl/muiTreeView
       aria-label: GitHub
     homepage:
       icon: fa-home
-      href: http://felixluginbuhl.com
+      href: https://felixluginbuhl.com
       aria-label: Felix Luginbuhl's website
 
 articles:

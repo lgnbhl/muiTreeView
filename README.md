@@ -1,15 +1,17 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# muiTreeView
+# muiTreeView <img src="man/figures/logo.png" align="right" height="138" alt="muiTreeView logo" />
 
 <!-- badges: start -->
 
 [![CRAN
 status](https://www.r-pkg.org/badges/version/muiTreeView)](https://CRAN.R-project.org/package=muiTreeView)
 [![R-CMD-check](https://github.com/lgnbhl/muiTreeView/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/lgnbhl/muiTreeView/actions/workflows/R-CMD-check.yaml)
-[![](https://img.shields.io/badge/@mui/x--tree--view-8.25.0-blue.svg)](https://mui.com/x/react-tree-view/)
-[![](https://img.shields.io/badge/react-18.3.1-blue.svg)](https://mui.com/x/react-tree-view/)
+[![@mui/x-tree-view
+9.0.2](https://img.shields.io/badge/@mui/x--tree--view-9.0.2-blue.svg)](https://mui.com/x/react-tree-view/)
+[![react
+18.3.1](https://img.shields.io/badge/react-18.3.1-blue.svg)](https://react.dev/)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Follow-E4405F?style=social&logo=linkedin)](https://www.linkedin.com/in/FelixLuginbuhl)
 <!-- badges: end -->
 

@@ -11,3 +11,4 @@
 ^inst/helpers$
 ^renovate.json
 ^reinstall.sh$
+^dev$
