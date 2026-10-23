@@ -26,13 +26,13 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: r-lib/actions/setup-pandoc@v2.12.1
+      - uses: r-lib/actions/setup-pandoc@v2.14.0
 
-      - uses: r-lib/actions/setup-r@v2.12.1
+      - uses: r-lib/actions/setup-r@v2.14.0
         with:
           use-public-rspm: true
 
-      - uses: r-lib/actions/setup-r-dependencies@v2.12.1
+      - uses: r-lib/actions/setup-r-dependencies@v2.14.0
         with:
           extra-packages: any::pkgdown, any::jsonlite, any::dplyr, any::reactRouter, local::.
           needs: website
